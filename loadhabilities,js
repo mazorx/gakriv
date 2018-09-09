@@ -1,0 +1,31 @@
+var parser, xmlDoc;
+var habs;
+
+
+function load(){
+  var habs = $.ajax({
+                    url: "https://gist.githubusercontent.com/mazorx/92fa50fecfdbfdb1d189f17bc4f875f9/raw/a5ddf7b01b9e0c8bd7651e32a148190c736903e9/habilidades.xml",
+                    async: false
+                 }).responseText;
+    document.getElementById("demo").innerHTML = safe_tags(habs);
+}
+
+
+function myFunction(xml) {
+    var x, i, txt, xmlDoc; 
+    xmlDoc = xml.responseXML;
+    txt = "";
+    x = xmlDoc.getElementsByTagName("title");
+    for (i = 0; i < x.length; i++) { 
+        txt += x[i].childNodes[0].nodeValue + "<br>";
+    }
+    document.getElementById("demo").innerHTML = safe_tags(habs);
+}
+
+function safe_tags(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;') ;
+}
+
+function test(){
+	
+}
