@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<style>
+.tooltip {
+    position: relative;
+    display: inline-block;
+    width:150px;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200%;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    left:calc(-50%)
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+</style>
+
+<body onload="load()">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="loadhabilities.js"></script>
+<script>
+</script>
+
+<div id="bu" class="tooltip">
+<img src="
+https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+"/><br/>
+Pancada Corporal
+  <span class="tooltiptext">
+Pancada Corporal<br/>
+TIPO: Ativa (Ofensiva)<br/>
+PRÉ-REQUISITO: --<br/>
+Usa o próprio corpo para causar dano em um inimigo.<br/>
+O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.</span>
+</div>
+
+<p id="demo"></p>
+
+
+</body>
+</html>
