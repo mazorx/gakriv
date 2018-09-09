@@ -4,22 +4,55 @@ var habs;
 
 function load(){
   var habs = $.ajax({
-                    url: "https://gist.githubusercontent.com/mazorx/92fa50fecfdbfdb1d189f17bc4f875f9/raw/a5ddf7b01b9e0c8bd7651e32a148190c736903e9/habilidades.xml",
+                    url: "https://gist.githubusercontent.com/mazorx/92fa50fecfdbfdb1d189f17bc4f875f9/raw/dc89ce183e91a21f0e3af04b27bbc3031390e863/habilidades.xml",
                     async: false
                  }).responseText;
-    document.getElementById("demo").innerHTML = safe_tags(habs);
+    var x, i, txt, xmlDoc; 
+	parser = new DOMParser();
+	xmlDoc = parser.parseFromString(habs,"text/xml");
+    txt = "";
+    x = xmlDoc.getElementsByTagName("hability");
+    for (i = 0; i < x.length; i++) {
+		var cod = xmlDoc.getElementsByTagName("cod")[i].childNodes[0].nodeValue.split("\n")[0];
+		var img = xmlDoc.getElementsByTagName("image")[i].childNodes[0].nodeValue;
+		var title = xmlDoc.getElementsByTagName("title")[i].childNodes[0].nodeValue;
+		var type = xmlDoc.getElementsByTagName("type")[i].childNodes[0].nodeValue;
+		var description = xmlDoc.getElementsByTagName("description")[i].childNodes[0].nodeValue;
+		var reqhab = "-";
+		var reqhabtitle = "-";
+		var reqlvl = "-";
+		try{
+			var reqhab = xmlDoc.getElementsByTagName("reqhab")[i].childNodes[0].nodeValue;
+			var reqlvl = xmlDoc.getElementsByTagName("reqlvl")[i].childNodes[0].nodeValue;
+			for (e = 0; e < x.length; e++) {
+				if(e == parseInt(reqhab)){
+					reqhabtitle=xmlDoc.getElementsByTagName("title")[e].childNodes[0].nodeValue;
+				}
+			}
+		}
+		catch(err){
+		}
+		
+		txt += "<div id=\""+cod+"\" style=\"position:relative;left:0px;top:0px;\" class=\"tooltip\"> <img onclick=\"test()\" src=\""
+		+ img
+		+"\"/><br/>"
+		+title
+		+"<span class=\"tooltiptext\">"
+		+title
+		+"<br/>TIPO: "
+		+type
+		+"<br/>"
+		+"PRÉ-REQUISITO: "
+		+reqhabtitle + " | " + reqlvl
+		+"<br/>"
+		+description
+		+"</span></div><br/><br/>";
+    }
+    document.getElementById("demo").innerHTML = txt;
 }
 
 
 function myFunction(xml) {
-    var x, i, txt, xmlDoc; 
-    xmlDoc = xml.responseXML;
-    txt = "";
-    x = xmlDoc.getElementsByTagName("title");
-    for (i = 0; i < x.length; i++) { 
-        txt += x[i].childNodes[0].nodeValue + "<br>";
-    }
-    document.getElementById("demo").innerHTML = safe_tags(habs);
 }
 
 function safe_tags(str) {
@@ -27,5 +60,10 @@ function safe_tags(str) {
 }
 
 function test(){
-	
+	var d = document.getElementById("1");
+	var x = parseInt(d.style.getPropertyValue("left").split("px")[0]);
+	var y = parseInt(d.style.getPropertyValue("top").split("px")[0]);
+	d.style.position = "absolute";
+	d.style.left = (x+30) + "px";
+	d.style.top = (y+30) + "px";
 }
