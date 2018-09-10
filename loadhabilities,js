@@ -2,6 +2,8 @@ var parser, xmlDoc;
 var habs;
 var levels
 var canvas;
+var habs;
+var rows = [];
 
 
 function load(){
@@ -18,56 +20,27 @@ function load(){
 	
     txt = "";
     x = getTags("hability");
+	habs = new Array(x.length);
     for (i = 0; i < x.length; i++) {
-		var cod = getTag("cod",i).split("\n")[0];
-		var img = getTag("image",i);
-		var title = getTag("title",i);
-		var type = getTag("type",i);
-		var description = getTag("description",i);
-		var reqhab = "-";
-		var reqhabtitle = "- ";
-		var reqlvl = "-";
-		try{
-			for(var e = 0; e < getTags("reqhab",x[1]).length; e++){
-				if(reqhabtitle == "- "){
-					reqhabtitle = "";
-				}
-				var reqhab = getTag("reqhab",e,x[i]).childNodes[0].nodeValue;
-				for (e = 0; e < x.length; e++) {
-					if(e == reqhab){
-						reqhabtitle +=getTag("title")[e] + "/";
-					}
-				}
+		habs[i] = new hability(x[i]);
+		var checkrow = false;
+		for(var r = 0; r < rows.length; r++){
+			if(getTag("reqlvl",i) == rows[r]){
+				checkrow = true;
 			}
-			reqhabtitle = reqhabtitle.substring(0,reqhabtitle.length-1);
-			var reqlvl = getTag("reqlvl",i);
 		}
-		catch(err){
-			
+		if(!checkrow){
+			rows = rows.concat(getTag("reqlvl",i));
 		}
-		
-		txt += "<div id=\""+cod+"\" style=\"position:relative;left:0px;top:0px;\" class=\"tooltip\"> <img onclick=\"test()\" src=\""
-		+ img
-		+"\"/><br/>"
-		+title
-		+"<span class=\"tooltiptext\">"
-		+title
-		+"<br/>TIPO: "
-		+type
-		+"<br/>"
-		+"PRÉ-REQUISITO: "
-		+reqhabtitle + " | " + reqlvl
-		+"<br/>"
-		+description
-		+"</span></div><br/><br/>";
     }
-    document.getElementById("habs").innerHTML = txt;
-	
+	rows.sort();
 	chave(200,300,250,0);
 }
 
-function setLevels(levels){
-	
+function setPositions(){
+	for(int i = 0; i < rows.length(); i++){
+		
+	}
 }
 
 function getTags(tag,xml=xmlstring){
@@ -100,22 +73,11 @@ function getTag(tag,i,xml=xmlstring){
 	return toret;
 }
 
-
-function myFunction(xml) {
-}
-
 function safe_tags(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;');
-	
 }
 
-function test(){
-	var d = document.getElementById("1");
-	var x = parseInt(d.style.getPropertyValue("left").split("px")[0]);
-	var y = parseInt(d.style.getPropertyValue("top").split("px")[0]);
-	d.style.position = "absolute";
-	d.style.left = (x+30) + "px";
-	d.style.top = (y+30) + "px";
+function levelup(cod){
 }
 
 function createLine(x1, y1, x2, y2) {
@@ -144,6 +106,60 @@ function chave(x1,y1,x2,y2){
 	ctx.stroke();
 }
 
+class hability {
+	constructor(xml){
+		this.xml = xml;
+		this.cod = getTag("cod",0,xml).split("\n")[0];
+		this.img = getTag("image",0,xml);
+		this.title = getTag("title",0,xml);
+		this.type = getTag("type",0,xml);
+		this.description = getTag("description",0,xml);
+		this.reqhab = "-";
+		this.reqhabtitle = "- ";
+		this.reqlvl = "-";
+		
+		this.x = 0;
+		this.y = 0;
+		this.wid = 200;
+		try{
+			for(var e = 0; e < getTags("reqhab",xml).length; e++){
+				if(reqhabtitle == "- "){
+					reqhabtitle = "";
+				}
+				var reqhab = getTag("reqhab",e,xml).childNodes[0].nodeValue;
+				for (e = 0; e < x.length; e++) {
+					if(e == reqhab){
+						reqhabtitle +=getTag("title")[e] + ", ";
+					}
+				}
+			}
+			reqhabtitle = reqhabtitle.substring(0,reqhabtitle.length-2);
+			var reqlvl = getTag("reqlvl",i);
+		}
+		catch(err){
+			
+		}
+		this.setHtml();
+	}
+	
+	setHtml(){
+		this.html = "<div id=\""+this.cod+"\" style=\"position:absolute;left:"+this.x+"px;top:"+this.y+"px;\" class=\"tooltip\"> <img onclick=\"levelup("+this.cod+")\" src=\""
+		+ this.img
+		+"\"/><br/>"
+		+this.title
+		+"<span class=\"tooltiptext\">"
+		+this.title
+		+"<br/>TIPO: "
+		+this.type
+		+"<br/>"
+		+"PRÉ-REQUISITO: "
+		+this.reqhabtitle + " | " + this.reqlvl
+		+"<br/>"
+		+this.description
+		+"</span></div>";
+	}
+}
+
 function getsubquant(cod){
 	var x = xmlDoc.getElementsByTagName("hability");
 	for(var i = 0;i < x.length;i++){
@@ -167,7 +183,7 @@ var xmlstring = `<class>
 		<title>
 		Defender Impacto
 		</title>
-		<requires><reqhab></reqhab><reqlvl></reqlvl></requires>
+		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
 		<type>
 		Ativa (Defensiva)
 		</type>
@@ -185,7 +201,7 @@ var xmlstring = `<class>
 		<title>
 		Pancada Corporal
 		</title>
-		<requires><reqhab></reqhab><reqlvl></reqlvl></requires>
+		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
 		</type>
