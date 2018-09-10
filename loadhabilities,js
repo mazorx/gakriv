@@ -4,10 +4,13 @@ var levels
 var canvas;
 var habs;
 var rows = [];
+var margin = 25;
+var globalwid = 70;
+var globalhei = 70;
 
 
 function load(){
-  var habs = $.ajax({
+  var xmlonline = $.ajax({
                     url: "https://gist.githubusercontent.com/mazorx/92fa50fecfdbfdb1d189f17bc4f875f9/raw/dc89ce183e91a21f0e3af04b27bbc3031390e863/habilidades.xml",
                     async: false
                  }).responseText;
@@ -34,12 +37,50 @@ function load(){
 		}
     }
 	rows.sort();
-	chave(200,300,250,0);
+	
+	setPositions();
+	drawAll();
+	
+	//chave(200,300,250,0);
 }
 
 function setPositions(){
-	for(int i = 0; i < rows.length(); i++){
-		
+	//Posições mais basicas
+	for(var i = 0; i < rows.length; i++){
+		var curpos = 1;
+		var currow = rows[i];
+		var curx = margin;
+		for(var h = 0; h < habs.length; h++){
+			if(habs[h].getLvl() == currow){
+				
+				habs[h].setX(curx);
+				habs[h].setY((currow-1)*globalhei + margin);
+				curx = curx + habs[h].getWid();
+				curpos++;
+			}
+		}
+	}
+}
+
+function getSubs(cod){
+	var toret = 0;
+	var tags = getTags("hability");
+	for(var i = 0; i < tags.length; i++){
+		var rr = getTags("reqhab",tags[i]);
+		for(var r = 0; r < rr.length; r++){
+			if(rr[r] == cod){
+				toret++;
+			}
+		}
+	}
+	return toret;
+}
+
+function drawAll(){
+	document.getElementById("habs").innerHTML = "";
+	for(var h = 0; h < habs.length; h++){
+		habs[h].setHtml();
+		document.getElementById("habs").innerHTML = document.getElementById("habs").innerHTML + (habs[h].getHtml());
 	}
 }
 
@@ -99,6 +140,7 @@ function createLine(x1, y1, x2, y2) {
 function chave(x1,y1,x2,y2){
 	var ctx = canvas.getContext("2d");
 	ctx.beginPath();
+	ctx.lineWidth = 4;
 	ctx.moveTo(x1, y1);
 	var halfy = y1 > y2 ? (y1-y2)/2 : (y2-y1)/2;
 	ctx.strokeStyle="#fff";
@@ -109,32 +151,35 @@ function chave(x1,y1,x2,y2){
 class hability {
 	constructor(xml){
 		this.xml = xml;
-		this.cod = getTag("cod",0,xml).split("\n")[0];
-		this.img = getTag("image",0,xml);
-		this.title = getTag("title",0,xml);
-		this.type = getTag("type",0,xml);
-		this.description = getTag("description",0,xml);
-		this.reqhab = "-";
+		this.cod = decode(getTag("cod",0,xml).split("\n")[0]);
+		this.img = decode(getTag("image",0,xml));
+		this.title = decode(getTag("title",0,xml));
+		this.type = decode(getTag("type",0,xml));
+		this.description = decode(getTag("description",0,xml));
+		this.reqlvl = decode(getTag("reqlvl",0,xml));
+		this.reqhab = getTags("reqhab",xml);
 		this.reqhabtitle = "- ";
-		this.reqlvl = "-";
+		this.subs = getSubs(this.cod);
 		
+		this.pos=0;
 		this.x = 0;
 		this.y = 0;
-		this.wid = 200;
+		this.wid = globalwid * this.subs;
+		if(this.wid == 0)
+			this.wid = globalwid;
 		try{
-			for(var e = 0; e < getTags("reqhab",xml).length; e++){
+			for(var e = 0; e < reqhab.length; e++){
 				if(reqhabtitle == "- "){
 					reqhabtitle = "";
 				}
-				var reqhab = getTag("reqhab",e,xml).childNodes[0].nodeValue;
+				var rr = getTag("reqhab",e,xml).childNodes[0].nodeValue;
 				for (e = 0; e < x.length; e++) {
-					if(e == reqhab){
-						reqhabtitle +=getTag("title")[e] + ", ";
+					if(e == rr){
+						reqhabtitle += decode(getTag("title")[e]) + ", ";
 					}
 				}
 			}
 			reqhabtitle = reqhabtitle.substring(0,reqhabtitle.length-2);
-			var reqlvl = getTag("reqlvl",i);
 		}
 		catch(err){
 			
@@ -143,7 +188,13 @@ class hability {
 	}
 	
 	setHtml(){
-		this.html = "<div id=\""+this.cod+"\" style=\"position:absolute;left:"+this.x+"px;top:"+this.y+"px;\" class=\"tooltip\"> <img onclick=\"levelup("+this.cod+")\" src=\""
+		this.html = "<div id=\""+this.cod
+		+"\" style=\"position:absolute;"
+		+"left:"+this.x+"px;"
+		+"top:"+this.y+"px;"
+		+"width:"+this.wid+"px;"
+		+"\""
+		+" class=\"tooltip\"> <img onclick=\"levelup("+this.cod+")\" src=\""
 		+ this.img
 		+"\"/><br/>"
 		+this.title
@@ -152,11 +203,63 @@ class hability {
 		+"<br/>TIPO: "
 		+this.type
 		+"<br/>"
-		+"PRÉ-REQUISITO: "
+		+decode("Pré Requisito: ")
 		+this.reqhabtitle + " | " + this.reqlvl
 		+"<br/>"
 		+this.description
 		+"</span></div>";
+	}
+	
+	hasParent(){
+		return this.reqhabtitle != "-"
+	}
+	
+	getReqHab(){
+		return reqhab;
+	}
+	
+	getTitle(){
+		return reqhabtitle;
+	}
+	
+	getLvl(){
+		return this.reqlvl;
+	}
+	
+	getPos(){
+		return this.pos;
+	}
+	
+	getX(){
+		return this.x;
+	}
+	
+	getY(){
+		return this.y;
+	}
+	
+	getWid(){
+		return this.wid;
+	}
+	
+	getHtml(){
+		return this.html;
+	}
+	
+	setX(x){
+		this.x = x;
+	}
+	
+	setY(y){
+		this.y = y;
+	}
+	
+	setPos(pos){
+		this.pos = pos;
+	}
+	
+	setWid(wid){
+		this.wid = wid;
 	}
 }
 
@@ -170,7 +273,13 @@ function getsubquant(cod){
 	}
 }
 
+function encode(s) {
+  return unescape(encodeURIComponent(s));
+}
 
+function decode(s) {
+  return decodeURIComponent(escape(s));
+}
 
 var xmlstring = `<class>
 	<rows>Lvl 1,Lvl 3,Lvl 6</rows>
@@ -211,7 +320,43 @@ var xmlstring = `<class>
 	</hability>
 	
 	<hability>
-		<cod>1
+		<cod>2
+		</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		</image>
+		<title>
+		Pancada Corporal
+		</title>
+		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
+		<type>
+		Ativa (Ofensiva)
+		</type>
+		<description>
+		Usa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		</description>
+	</hability>
+	
+	<hability>
+		<cod>3
+		</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		</image>
+		<title>
+		Pancada Corporal
+		</title>
+		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
+		<type>
+		Ativa (Ofensiva)
+		</type>
+		<description>
+		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		</description>
+	</hability>
+	
+	<hability>
+		<cod>4
 		</cod>
 		<image>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
