@@ -1,5 +1,7 @@
 var parser, xmlDoc;
 var habs;
+var levels
+var canvas;
 
 
 function load(){
@@ -7,30 +9,41 @@ function load(){
                     url: "https://gist.githubusercontent.com/mazorx/92fa50fecfdbfdb1d189f17bc4f875f9/raw/dc89ce183e91a21f0e3af04b27bbc3031390e863/habilidades.xml",
                     async: false
                  }).responseText;
-    var x, i, txt, xmlDoc; 
+    var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	xmlDoc = parser.parseFromString(habs,"text/xml");
+	
+	canvas = document.getElementById("canv");
+	canvas.width = screen.width;
+	canvas.height = screen.height;
+	
     txt = "";
-    x = xmlDoc.getElementsByTagName("hability");
+    x = getTags("hability");
     for (i = 0; i < x.length; i++) {
-		var cod = xmlDoc.getElementsByTagName("cod")[i].childNodes[0].nodeValue.split("\n")[0];
-		var img = xmlDoc.getElementsByTagName("image")[i].childNodes[0].nodeValue;
-		var title = xmlDoc.getElementsByTagName("title")[i].childNodes[0].nodeValue;
-		var type = xmlDoc.getElementsByTagName("type")[i].childNodes[0].nodeValue;
-		var description = xmlDoc.getElementsByTagName("description")[i].childNodes[0].nodeValue;
+		var cod = getTag("cod",i).split("\n")[0];
+		var img = getTag("image",i);
+		var title = getTag("title",i);
+		var type = getTag("type",i);
+		var description = getTag("description",i);
 		var reqhab = "-";
-		var reqhabtitle = "-";
+		var reqhabtitle = "- ";
 		var reqlvl = "-";
 		try{
-			var reqhab = xmlDoc.getElementsByTagName("reqhab")[i].childNodes[0].nodeValue;
-			var reqlvl = xmlDoc.getElementsByTagName("reqlvl")[i].childNodes[0].nodeValue;
-			for (e = 0; e < x.length; e++) {
-				if(e == parseInt(reqhab)){
-					reqhabtitle=xmlDoc.getElementsByTagName("title")[e].childNodes[0].nodeValue;
+			for(var e = 0; e < getTags("reqhab",x[1]).length; e++){
+				if(reqhabtitle == "- "){
+					reqhabtitle = "";
+				}
+				var reqhab = getTag("reqhab",e,x[i]).childNodes[0].nodeValue;
+				for (e = 0; e < x.length; e++) {
+					if(e == reqhab){
+						reqhabtitle +=getTag("title")[e] + "/";
+					}
 				}
 			}
+			reqhabtitle = reqhabtitle.substring(0,reqhabtitle.length-1);
+			var reqlvl = getTag("reqlvl",i);
 		}
 		catch(err){
+			
 		}
 		
 		txt += "<div id=\""+cod+"\" style=\"position:relative;left:0px;top:0px;\" class=\"tooltip\"> <img onclick=\"test()\" src=\""
@@ -48,7 +61,43 @@ function load(){
 		+description
 		+"</span></div><br/><br/>";
     }
-    document.getElementById("demo").innerHTML = txt;
+    document.getElementById("habs").innerHTML = txt;
+	
+	chave(200,300,250,0);
+}
+
+function setLevels(levels){
+	
+}
+
+function getTags(tag,xml=xmlstring){
+	var c = xml.split("<"+tag+">").length -1;
+	var toret = [];
+	for(var i = 0; i < c; i++){
+		try{
+			toret[i] = getTag(tag,i,xml);
+		}catch(err){
+			try{
+				toret.concat(getTag(tag,i,xml));
+			}catch(err){
+				
+			}
+		}
+	}
+	return toret;
+}
+
+function getTag(tag,i,xml=xmlstring){
+	var toret = "";
+		var s1 = xml.split("<"+tag+">")[i+1];
+		toret = s1.split("</"+tag+">")[0].replace("	","");
+		if(toret.substring(toret.length-1) == "\n"){
+			toret = toret.substring(0,toret.length-1);
+		}
+	try{
+	}catch(err){
+	}
+	return toret;
 }
 
 
@@ -56,7 +105,8 @@ function myFunction(xml) {
 }
 
 function safe_tags(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;') ;
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+	
 }
 
 function test(){
@@ -67,3 +117,98 @@ function test(){
 	d.style.left = (x+30) + "px";
 	d.style.top = (y+30) + "px";
 }
+
+function createLine(x1, y1, x2, y2) {
+    var a = x1 - x2,
+        b = y1 - y2,
+        c = Math.sqrt(a * a + b * b);
+
+    var sx = (x1 + x2) / 2,
+        sy = (y1 + y2) / 2;
+
+    var x = sx - c / 2,
+        y = sy;
+
+    var alpha = Math.PI - Math.atan2(-b, a);
+
+    return createLineElement(x, y, c, alpha);
+}
+
+function chave(x1,y1,x2,y2){
+	var ctx = canvas.getContext("2d");
+	ctx.beginPath();
+	ctx.moveTo(x1, y1);
+	var halfy = y1 > y2 ? (y1-y2)/2 : (y2-y1)/2;
+	ctx.strokeStyle="#fff";
+	ctx.bezierCurveTo(x1, y2, x2, y1, x2, y2);
+	ctx.stroke();
+}
+
+function getsubquant(cod){
+	var x = xmlDoc.getElementsByTagName("hability");
+	for(var i = 0;i < x.length;i++){
+		
+		if(x[i].getElementsByTagName("reqhab")){
+			
+		}
+	}
+}
+
+
+
+var xmlstring = `<class>
+	<rows>Lvl 1,Lvl 3,Lvl 6</rows>
+	<hability>
+		<cod>0
+		</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0114.jpg
+		</image>
+		<title>
+		Defender Impacto
+		</title>
+		<requires><reqhab></reqhab><reqlvl></reqlvl></requires>
+		<type>
+		Ativa (Defensiva)
+		</type>
+		<description>
+		Ganhe +1 permanente para usar o movimento Defender.
+		</description>
+	</hability>
+	
+	<hability>
+		<cod>1
+		</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		</image>
+		<title>
+		Pancada Corporal
+		</title>
+		<requires><reqhab></reqhab><reqlvl></reqlvl></requires>
+		<type>
+		Ativa (Ofensiva)
+		</type>
+		<description>
+		Usa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		</description>
+	</hability>
+	
+	<hability>
+		<cod>1
+		</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		</image>
+		<title>
+		Pancada Corporal
+		</title>
+		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
+		<type>
+		Ativa (Ofensiva)
+		</type>
+		<description>
+		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		</description>
+	</hability>
+</class>`;
