@@ -11,8 +11,8 @@
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 200%;
-    background-color: black;
-    color: #fff;
+    background-color: white;
+    color: #000;
     text-align: center;
     border-radius: 6px;
     padding: 5px 0;
@@ -29,13 +29,15 @@
 }
 </style>
 
-<body onload="load()">
+<body onload="load()" style="background-color:black;color:#fff;">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="loadhabilities.js"></script>
 <script>
 </script>
 
-<p id="demo"></p>
+<canvas id="canv" style="position:absolute;top:0px;left:0px;background-color:#000">Seu navegador nao suporta o canvas, que e responsavel pelas chaves</canvas>
+<div style="position:absolute;top:0px;left:0px;"><p id="habs"></p></div>
+
 
 
 </body>
