@@ -1,5 +1,5 @@
 # gakriv
-todo
+todo<br/>
 Verificar todas as habilidades
 	Calcular total wid da coluna com as subhabilidades
   posicao absoluta das habilidades
