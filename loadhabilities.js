@@ -2,7 +2,6 @@ var parser, xmlDoc;
 var habs;
 var levels
 var canvas;
-var habs;
 var rows = [];
 var margin = 25;
 var globalwid = 70;
@@ -62,18 +61,28 @@ function setPositions(){
 	}
 }
 
+
 function getSubs(cod){
 	var toret = 0;
 	var tags = getTags("hability");
 	for(var i = 0; i < tags.length; i++){
 		var rr = getTags("reqhab",tags[i]);
+		var rc = getTags("cod",tags[i]);
 		for(var r = 0; r < rr.length; r++){
 			if(rr[r] == cod){
 				toret++;
+				var subsubs = getSubs(rc[r].split("\n")[0]);
+				if(subsubs != 0){
+					toret += (subsubs -1);
+				}
 			}
 		}
 	}
 	return toret;
+}
+
+function log(str){
+	document.getElementById("debug").innerHTML = document.getElementById("debug").innerHTML + str + "<br/>";
 }
 
 function drawAll(){
@@ -82,6 +91,7 @@ function drawAll(){
 		habs[h].setHtml();
 		document.getElementById("habs").innerHTML = document.getElementById("habs").innerHTML + (habs[h].getHtml());
 	}
+	drawAllKeys();
 }
 
 function getTags(tag,xml=xmlstring){
@@ -140,12 +150,18 @@ function createLine(x1, y1, x2, y2) {
 function chave(x1,y1,x2,y2){
 	var ctx = canvas.getContext("2d");
 	ctx.beginPath();
-	ctx.lineWidth = 4;
+	ctx.lineWidth = 3;
 	ctx.moveTo(x1, y1);
 	var halfy = y1 > y2 ? (y1-y2)/2 : (y2-y1)/2;
 	ctx.strokeStyle="#fff";
 	ctx.bezierCurveTo(x1, y2, x2, y1, x2, y2);
 	ctx.stroke();
+}
+
+function drawAllKeys(){
+	for(var i = 0; i < habs.length; i++){
+		habs[i].drawKeys();
+	}
 }
 
 class hability {
@@ -208,6 +224,24 @@ class hability {
 		+"<br/>"
 		+this.description
 		+"</span></div>";
+	}
+	
+	drawKeys(){
+		for(var i = 0; i < habs.length; i++){
+			for(var rr = 0; rr < this.reqhab.length; rr++){
+				if(habs[i].getCod() == this.reqhab[rr]){
+					var hx = habs[i].getX() + (habs[i].getWid()/2);
+					var hy = habs[i].getY() + 70;
+					var tx = this.x + (this.wid/2);
+					var ty = this.y;
+					chave(tx,ty,hx,hy);
+				}
+			}
+		}
+	}
+	
+	getCod(){
+		return this.cod;
 	}
 	
 	hasParent(){
@@ -274,11 +308,19 @@ function getsubquant(cod){
 }
 
 function encode(s) {
-  return unescape(encodeURIComponent(s));
+	try{
+		return unescape(encodeURIComponent(s));
+	}catch(err){
+		return s;
+	}
 }
 
 function decode(s) {
-  return decodeURIComponent(escape(s));
+	try{
+		return decodeURIComponent(escape(s));
+	}catch(err){
+		return s;
+	}
 }
 
 var xmlstring = `<class>
