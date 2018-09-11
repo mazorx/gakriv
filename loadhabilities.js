@@ -16,7 +16,7 @@ function load(){
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	xmlstring = xmlonline;
+	//xmlstring = xmlonline;
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
@@ -81,7 +81,7 @@ function setPositions(){
 			var hr = -1;
 			if(habs[h].getRow() == i){
 				habs[h].setX(curx);
-				habs[h].setY((currow)*globalhei + margin);
+				habs[h].setY((currow-1)*globalhei + margin);
 				curx = curx + habs[h].getWid();
 				try{
 					if(habs[h].getReqHab().length > 0){
