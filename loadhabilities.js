@@ -115,14 +115,19 @@ function getposX(cod){
 
 function colideX(x,cod){
 	var toret = x;
+	var y = habs[cod].getY();
 	for(var i = 0; i < habs.length; i++){
 		var samereq = compareReqHab(cod,i);
 		//log(samereq);
-		if(habs[i].getX() == x & samereq){
-			//log(habs[i].getTitle() + ", " + habs[i].getX() + "/" + x);
-			toret = colideX(x+habs[i].getWid(),cod);
-		}else if(habs[i].getX() == x & habs[i].getY() == habs[cod].getY()){
-			toret = colideX(x+habs[i].getWid(),cod);
+		if(habs[i].getCod() != habs[cod].getCod()){
+			if(habs[i].getX() == x & samereq){
+				//log(habs[i].getTitle() + ", " + habs[i].getX() + "/" + x);
+				toret = colideX(x+habs[i].getWid(),cod);
+			}else if(!samereq &
+				(habs[i].getX() <= x & habs[i].getX() + habs[i].getWid() >= x) &
+				(habs[i].getY() <= y & habs[i].getY() + globalhei > y)){
+					toret = colideX(x+habs[i].getWid(),cod);
+			}
 		}
 	}
 	return toret;
