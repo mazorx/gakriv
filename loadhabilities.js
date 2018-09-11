@@ -68,8 +68,26 @@ function setRowsPerLevel(){
 	rows.sort();
 }
 
-function setRows(){
+function setRowsTag(){
 	rows = getTag("rows",0).split(",");
+}
+
+function setRows(){
+	var x = getTags("hability");
+	rows = [];
+    for (i = 0; i < x.length; i++) {
+		var search = false;
+		for(var r = 0; r < rows.length; r++){
+			if(rows[r] == getTag("row",0,x[i])){
+				search = true;
+			}
+		}
+		if(!search){
+			var conc = getTag("row",0,x[i]);
+			rows = rows.concat(conc);
+		}
+	}
+	log(rows);
 }
 
 function setPositions(){
@@ -314,7 +332,7 @@ class hability {
 		+this.type
 		+"<br/>"
 		+decode("Pré Requisito: ")
-		+this.reqhabtitle + " | " + this.reqlvl
+		+this.reqhabtitle + " | Level " + this.reqlvl
 		+"<br/>"
 		+this.description
 		+"</span></div>";
@@ -421,8 +439,29 @@ function decode(s) {
 	}
 }
 
+var xmlmodel = `
+	<hability>
+		<cod></cod>
+		<image>
+		
+		</image>
+		<title>
+		
+		</title>
+		<row>1</row>
+		<requires>
+		<reqhab></reqhab>
+		<reqlvl>1</reqlvl></requires>
+		<type>
+		
+		</type>
+		<description>
+		
+		</description>
+	</hability>
+`;
+
 var xmlstring = `<class>
-	<rows>Lvl 1,Lvl 3,Lvl 6,lvl99</rows>
 	<hability>
 		<cod>0</cod>
 		<image>
