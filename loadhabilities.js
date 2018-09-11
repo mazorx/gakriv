@@ -4,7 +4,7 @@ var levels
 var canvas;
 var rows = [];
 var margin = 25;
-var globalwid = 70;
+var globalwid = 100;
 var globalhei = 130;
 
 
@@ -73,20 +73,19 @@ function setRowsTag(){
 }
 
 function setRows(){
-	var x = getTags("hability");
-	rows = [];
+	var x = getTags("row");
+	var rquant = 0;
     for (i = 0; i < x.length; i++) {
-		var search = false;
-		for(var r = 0; r < rows.length; r++){
-			if(rows[r] == getTag("row",0,x[i])){
-				search = true;
-			}
-		}
-		if(!search){
-			var conc = getTag("row",0,x[i]);
-			rows = rows.concat(conc);
+		if(x[i] > rquant){
+			rquant = x[i];
 		}
 	}
+	
+	rows = [];
+	for(var i = 0; i < rquant; i++){
+		rows = rows.concat(i+1);
+	}
+	//log(rows);
 }
 
 function setPositions(){
@@ -136,7 +135,7 @@ function colideX(x,cod){
 	for(var i = 0; i < habs.length; i++){
 		var samereq = compareReqHab(cod,i);
 		//log(samereq);
-		if(habs[i].getCod() != habs[cod].getCod()){
+		if(habs[i].getCod() != habs[cod].getCod() & habs[cod].getCod() != 0){
 			if(habs[i].getX() == x & samereq){
 				//log(habs[i].getTitle() + ", " + habs[i].getX() + "/" + x);
 				toret = colideX(x+habs[i].getWid(),cod);
@@ -293,21 +292,21 @@ class hability {
 		if(this.wid == 0)
 			this.wid = globalwid;
 		try{
-			for(var e = 0; e < reqhab.length; e++){
-				if(reqhabtitle == "- "){
-					reqhabtitle = "";
-				}
-				var rr = getTag("reqhab",e,xml).childNodes[0].nodeValue;
-				for (e = 0; e < x.length; e++) {
-					if(e == rr){
-						reqhabtitle += decode(getTag("title")[e]) + ", ";
+			if(this.reqhab.length > 0){
+				this.reqhabtitle = "";
+			}
+			var thabs = getTags("hability");
+			for(var i = 0; i < thabs.length; i++){
+				for(var r = 0; r < this.reqhab.length; r++){
+					if(getTag("cod",0,thabs[i]) == this.reqhab[r]){
+						this.reqhabtitle += "<br/>" + decode(getTag("title",0,thabs[i])) + ", ";
 					}
 				}
 			}
-			reqhabtitle = reqhabtitle.substring(0,reqhabtitle.length-2);
+			this.reqhabtitle = this.reqhabtitle.substring(0,this.reqhabtitle.length-2);
 		}
 		catch(err){
-			
+			//log(err);
 		}
 		this.setHtml();
 	}
@@ -325,14 +324,14 @@ class hability {
 		+"<div style=\"background-color:black;\">"
 		+this.title
 		+"</div>"
-		+"<span class=\"tooltiptext\">"
+		+"<span style=\"text-align:left;padding:5px;\" class=\"tooltiptext\">"
 		+this.title
 		+"<br/>TIPO: "
 		+this.type
-		+"<br/>"
+		+"<br/><b>"
 		+decode("Pré Requisito: ")
 		+this.reqhabtitle + " | Level " + this.reqlvl
-		+"<br/>"
+		+"</b><br/>"
 		+this.description
 		+"</span></div>";
 	}
@@ -474,9 +473,10 @@ var xmlstring = `<class>
 		<reqhab></reqhab>
 		<reqlvl>1</reqlvl></requires>
 		<type>Ativa (Defensiva)</type>
-		<description>Ganhe +1 permanente para usar o movimento Defender.</description>
+		<description>
+		Ganhe +1 permanente para usar o movimento Defender.
+		</description>
 	</hability>
-	
 	<hability>
 		<cod>1</cod>
 		<image>
@@ -496,96 +496,139 @@ var xmlstring = `<class>
 		Usa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
 		</description>
 	</hability>
-	
 	<hability>
 		<cod>2</cod>
 		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		https://i.servimg.com/u/f58/16/36/10/96/0314.jpg
 		</image>
 		<title>
-		Pancada Bruta
+		Reforçar Armadura
 		</title>
 		<row>1</row>
-		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
+		<requires>
+		<reqhab></reqhab>
+		<reqlvl>1</reqlvl></requires>
 		<type>
-		Ativa (Ofensiva)
+		Passiva
 		</type>
 		<description>
-		Usa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		Aumenta permanentemente a Armadura em +1.
 		</description>
 	</hability>
-	
 	<hability>
 		<cod>3</cod>
 		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		https://i.servimg.com/u/f58/16/36/10/96/0414.jpg
 		</image>
 		<title>
-		Pancada Tancosa
+		Reforçar Defesa Mágica
 		</title>
-		<row>2</row>
-		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
+		<row>1</row>
+		<requires>
+		<reqhab></reqhab>
+		<reqlvl>1</reqlvl></requires>
 		<type>
-		Ativa (Ofensiva)
+		Passiva
 		</type>
 		<description>
-		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		Aumenta permanentemente a Defesa Mágica em +1.
 		</description>
 	</hability>
-	
 	<hability>
 		<cod>4</cod>
 		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		https://i.servimg.com/u/f58/16/36/10/96/0514.jpg
 		</image>
 		<title>
-		Pancada Punk
+		Vitalidade
 		</title>
-		<row>3</row>
-		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
+		<row>1</row>
+		<requires>
+		<reqhab></reqhab>
+		<reqlvl>2</reqlvl></requires>
 		<type>
-		Ativa (Ofensiva)
+		Passiva
 		</type>
 		<description>
-		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		Ganha +1 de HP máximo para cada 2 níveis.
 		</description>
 	</hability>
-	
 	<hability>
 		<cod>5</cod>
 		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		https://i.servimg.com/u/f58/16/36/10/96/0614.jpg
 		</image>
 		<title>
-		Pancada Dancada
+		Força de Espírito
+		</title>
+		<row>2</row>
+		<requires>
+		<reqhab>4</reqhab>
+		<reqlvl>2</reqlvl></requires>
+		<type>
+		Passiva
+		</type>
+		<description>
+		Regenera 1 de vida por turno para cada 10 pontos de HP máximo.
+		</description>
+	</hability>
+	<hability>
+		<cod>6</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0714.jpg
+		</image>
+		<title>
+		Revestir
+		</title>
+		<row>2</row>
+		<requires>
+		<reqhab>2</reqhab>
+		<reqhab>3</reqhab>
+		<reqlvl>1</reqlvl></requires>
+		<type>
+		Ativa (Defensiva)
+		</type>
+		<description>
+		Aumenta o bônus de Reforçar Armadura e Reforçar Defesa Mágica por +1 por 2 turnos.
+		</description>
+	</hability>
+	<hability>
+		<cod>7</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0815.jpg
+		</image>
+		<title>
+		Pancada Estonteante
 		</title>
 		<row>4</row>
-		<requires><reqhab>4</reqhab><reqlvl>5</reqlvl></requires>
-		<type>
-		Ativa (Ofensiva)
-		</type>
-		<description>
-		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
-		</description>
-	</hability>
-	<hability>
-		<cod>5</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
-		</image>
-		<title>
-		Pancada Duplamente Qualificada
-		</title>
-		<row>3</row>
 		<requires>
-		<reqhab>0</reqhab>
 		<reqhab>1</reqhab>
 		<reqlvl>5</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
 		</type>
 		<description>
-		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		Dá uma pancada forte no corpo de um oponente que lhe joga para longe e causa 1d8 de dano.
 		</description>
 	</hability>
-</class>`;
+	<hability>
+		<cod>8</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0914.jpg
+		</image>
+		<title>
+		Escudo Refletor
+		</title>
+		<row>4</row>
+		<requires>
+		<reqhab>0</reqhab>
+		<reqlvl>5</reqlvl></requires>
+		<type>
+		Ativa (Utilitária)
+		</type>
+		<description>
+		Ao ativar esta habilidade, ela durará por 3 turnos e devolverá 1d4 para cado dano recebido ao atacante automaticamente (se o atacante acertar a pancada no Tank, ele sofrerá o dano de retorno sem precisar de rolagem).
+		</description>
+	</hability>
+</class>
+`;
