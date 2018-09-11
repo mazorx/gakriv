@@ -10,11 +10,13 @@ var globalhei = 130;
 
 function load(){
   var xmlonline = $.ajax({
-                    url: "https://gist.githubusercontent.com/mazorx/92fa50fecfdbfdb1d189f17bc4f875f9/raw/dc89ce183e91a21f0e3af04b27bbc3031390e863/habilidades.xml",
+                    url: "https://raw.githubusercontent.com/mazorx/gakriv/master/habilidades.xml",
                     async: false
                  }).responseText;
+	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
+	xmlstring = xmlonline;
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
@@ -30,9 +32,24 @@ function load(){
 	}
 	
 	setPositions();
+	
+	canvas.width = firstWid() + 150;
+	canvas.height = (rows.length * globalhei) + (margin * 2) + 150;
+	
 	drawAll();
 	
+	
 	//chave(200,300,250,0);
+}
+
+function firstWid(){
+	var toret = 0;
+	for(var i = 0; i < habs.length; i++){
+		if(habs[i].getRow() == 1){
+			toret += habs[i].getWid();
+		}
+	}
+	return toret;
 }
 
 function setRowsPerLevel(){
@@ -104,6 +121,8 @@ function colideX(x,cod){
 		if(habs[i].getX() == x & samereq){
 			//log(habs[i].getTitle() + ", " + habs[i].getX() + "/" + x);
 			toret = colideX(x+habs[i].getWid(),cod);
+		}else if(habs[i].getX() == x & habs[i].getY() == habs[cod].getY()){
+			toret = colideX(x+habs[i].getWid(),cod);
 		}
 	}
 	return toret;
@@ -134,7 +153,7 @@ function getSubs(cod){
 		for(var r = 0; r < rr.length; r++){
 			if(rr[r] == cod){
 				toret++;
-				var subsubs = getSubs(rc[r].split("\n")[0]);
+				var subsubs = getSubs(rc[0].split("\n")[0]);
 				if(subsubs != 0){
 					toret += (subsubs -1);
 				}
@@ -145,7 +164,7 @@ function getSubs(cod){
 }
 
 function log(str){
-	document.getElementById("debug").innerHTML = document.getElementById("debug").innerHTML + str + "<br/>";
+	document.getElementById("debug").innerHTML = document.getElementById("debug").innerHTML + safe_tags(str) + "<br/>";
 }
 
 function drawAll(){
@@ -188,7 +207,11 @@ function getTag(tag,i,xml=xmlstring){
 }
 
 function safe_tags(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+	try{
+		return str.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+	}catch(err){
+		return str;
+	}
 }
 
 function levelup(cod){
@@ -394,11 +417,15 @@ function decode(s) {
 }
 
 var xmlstring = `<class>
-	<rows>Lvl 1,Lvl 3,Lvl 6</rows>
+	<rows>Lvl 1,Lvl 3,Lvl 6,lvl99</rows>
 	<hability>
 		<cod>0</cod>
-		<image>https://i.servimg.com/u/f58/16/36/10/96/0114.jpg</image>
-		<title>Defender Impacto</title>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0114.jpg
+		</image>
+		<title>
+		Defender Impacto
+		</title>
 		<row>1</row>
 		<requires>
 		<reqhab></reqhab>
@@ -408,8 +435,7 @@ var xmlstring = `<class>
 	</hability>
 	
 	<hability>
-		<cod>1
-		</cod>
+		<cod>1</cod>
 		<image>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
@@ -417,7 +443,9 @@ var xmlstring = `<class>
 		Pancada Corporal
 		</title>
 		<row>1</row>
-		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
+		<requires>
+		<reqhab></reqhab>
+		<reqlvl>1</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
 		</type>
@@ -427,8 +455,7 @@ var xmlstring = `<class>
 	</hability>
 	
 	<hability>
-		<cod>2
-		</cod>
+		<cod>2</cod>
 		<image>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
@@ -446,8 +473,7 @@ var xmlstring = `<class>
 	</hability>
 	
 	<hability>
-		<cod>3
-		</cod>
+		<cod>3</cod>
 		<image>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
@@ -465,8 +491,7 @@ var xmlstring = `<class>
 	</hability>
 	
 	<hability>
-		<cod>4
-		</cod>
+		<cod>4</cod>
 		<image>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
@@ -484,16 +509,35 @@ var xmlstring = `<class>
 	</hability>
 	
 	<hability>
-		<cod>5
-		</cod>
+		<cod>5</cod>
 		<image>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
 		<title>
 		Pancada Dancada
 		</title>
-		<row>3</row>
+		<row>4</row>
 		<requires><reqhab>4</reqhab><reqlvl>5</reqlvl></requires>
+		<type>
+		Ativa (Ofensiva)
+		</type>
+		<description>
+		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		</description>
+	</hability>
+	<hability>
+		<cod>5</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		</image>
+		<title>
+		Pancada Duplamente Qualificada
+		</title>
+		<row>3</row>
+		<requires>
+		<reqhab>0</reqhab>
+		<reqhab>1</reqhab>
+		<reqlvl>5</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
 		</type>
