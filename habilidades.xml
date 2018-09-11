@@ -139,7 +139,7 @@
 		<title>
 		Pancada Estonteante
 		</title>
-		<row>1</row>
+		<row>4</row>
 		<requires>
 		<reqhab>1</reqhab>
 		<reqlvl>5</reqlvl></requires>
@@ -158,7 +158,7 @@
 		<title>
 		Escudo Refletor
 		</title>
-		<row>1</row>
+		<row>4</row>
 		<requires>
 		<reqhab>0</reqhab>
 		<reqlvl>5</reqlvl></requires>
