@@ -4,7 +4,7 @@ var levels
 var canvas;
 var rows = [];
 var margin = 25;
-var globalwid = 100;
+var globalwid = 110;
 var globalhei = 130;
 
 
@@ -282,6 +282,7 @@ class hability {
 		this.reqhabtitle = "- ";
 		this.subs = getSubs(this.cod);
 		this.row = decode(getTag("row",0,xml));
+		this.grayscale = 100;
 		
 		this.pos=0;
 		this.x = 0;
@@ -310,15 +311,28 @@ class hability {
 	}
 	
 	setHtml(){
+	
+	var textshadow = " -1px -1px 4px #000, ";
+	var tsm = 6;
+	var tsfinal = "";
+	
+	for(var i = 0; i < tsm; i++){
+		tsfinal += textshadow;
+	}
+	
+	tsfinal = tsfinal.substring(0,tsfinal.length-2);
+	
 		this.html = "<div id=\""+this.cod
 		+"\" style=\"position:absolute;"
 		+"left:"+this.x+"px;"
 		+"top:"+this.y+"px;"
 		+"width:"+this.wid+"px;"
 		+"\""
-		+" class=\"tooltip\"> <img onclick=\"levelup("+this.cod+")\" src=\""
+		+" class=\"tooltip\"> <div style=\"position:relative;width:50px;left:calc(50% - 25px)\"><img style=\"filter: grayscale("+this.grayscale+"%);\" onclick=\"levelup("+this.cod+")\" src=\""
 		+ this.img
-		+"\"/><br/>"
+		+"\"/>"
+		+"<div style=\"position:absolute;right:-20px;bottom:-5px;color:yellow;text-shadow: "+tsfinal+";\">LvL "+this.reqlvl+"</div>"
+		+"</div>"
 		+"<div style=\"background-color:black;\">"
 		+this.title
 		+"</div>"
@@ -392,6 +406,10 @@ class hability {
 		return this.html;
 	}
 	
+	getGrayscale(){
+		return this.grayscale;
+	}
+	
 	setX(x){
 		this.x = x;
 	}
@@ -406,6 +424,10 @@ class hability {
 	
 	setWid(wid){
 		this.wid = wid;
+	}
+	
+	setGrayscale(gs){
+		this.grayscale = gs;
 	}
 }
 
