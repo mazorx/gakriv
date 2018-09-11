@@ -81,7 +81,7 @@
 		<title>
 		Vitalidade
 		</title>
-		<row>2</row>
+		<row>1</row>
 		<requires>
 		<reqhab></reqhab>
 		<reqlvl>2</reqlvl></requires>
@@ -100,7 +100,7 @@
 		<title>
 		Força de Espírito
 		</title>
-		<row>3</row>
+		<row>2</row>
 		<requires>
 		<reqhab>4</reqhab>
 		<reqlvl>2</reqlvl></requires>
