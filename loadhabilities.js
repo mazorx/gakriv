@@ -50,6 +50,7 @@ function setPositions(){
 		var currow = rows[i];
 		var curx = margin;
 		for(var h = 0; h < habs.length; h++){
+			var hr = -1;
 			if(habs[h].getLvl() == currow){
 				
 				habs[h].setX(curx);
@@ -176,6 +177,7 @@ class hability {
 		this.reqhab = getTags("reqhab",xml);
 		this.reqhabtitle = "- ";
 		this.subs = getSubs(this.cod);
+		this.row = decode(getTag("row",0,xml));
 		
 		this.pos=0;
 		this.x = 0;
@@ -238,6 +240,10 @@ class hability {
 				}
 			}
 		}
+	}
+	
+	getRow(){
+		return this.row;
 	}
 	
 	getCod(){
@@ -326,21 +332,15 @@ function decode(s) {
 var xmlstring = `<class>
 	<rows>Lvl 1,Lvl 3,Lvl 6</rows>
 	<hability>
-		<cod>0
-		</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0114.jpg
-		</image>
-		<title>
-		Defender Impacto
-		</title>
-		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
-		<type>
-		Ativa (Defensiva)
-		</type>
-		<description>
-		Ganhe +1 permanente para usar o movimento Defender.
-		</description>
+		<cod>0</cod>
+		<image>https://i.servimg.com/u/f58/16/36/10/96/0114.jpg</image>
+		<title>Defender Impacto</title>
+		<row>1</row>
+		<requires>
+		<reqhab></reqhab>
+		<reqlvl>1</reqlvl></requires>
+		<type>Ativa (Defensiva)</type>
+		<description>Ganhe +1 permanente para usar o movimento Defender.</description>
 	</hability>
 	
 	<hability>
@@ -352,6 +352,7 @@ var xmlstring = `<class>
 		<title>
 		Pancada Corporal
 		</title>
+		<row></row>
 		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
@@ -370,6 +371,7 @@ var xmlstring = `<class>
 		<title>
 		Pancada Corporal
 		</title>
+		<row>1</row>
 		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
@@ -388,6 +390,7 @@ var xmlstring = `<class>
 		<title>
 		Pancada Corporal
 		</title>
+		<row>2</row>
 		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
@@ -406,7 +409,27 @@ var xmlstring = `<class>
 		<title>
 		Pancada Corporal
 		</title>
+		<row>3</row>
 		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
+		<type>
+		Ativa (Ofensiva)
+		</type>
+		<description>
+		Usaaa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
+		</description>
+	</hability>
+	
+	<hability>
+		<cod>5
+		</cod>
+		<image>
+		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
+		</image>
+		<title>
+		Pancada Corporal
+		</title>
+		<row>3</row>
+		<requires><reqhab>4</reqhab><reqlvl>5</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
 		</type>
