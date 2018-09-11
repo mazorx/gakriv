@@ -136,13 +136,11 @@ function colideX(x,cod){
 		var samereq = compareReqHab(cod,i);
 		//log(samereq);
 		if(habs[i].getCod() != habs[cod].getCod() & habs[cod].getCod() != 0){
-			if(habs[i].getX() == x & samereq){
-				//log(habs[i].getTitle() + ", " + habs[i].getX() + "/" + x);
-				toret = colideX(x+habs[i].getWid(),cod);
-			}else if(!samereq &
-				(habs[i].getX() <= x & habs[i].getX() + habs[i].getWid() >= x) &
+			if((habs[i].getX() <= x & habs[i].getX() + habs[i].getWid() >= x) &
 				(habs[i].getY() <= y & habs[i].getY() + globalhei > y)){
-					toret = colideX(x+habs[i].getWid(),cod);
+					toret = colideX(habs[i].getX() + habs[i].getWid()+1,cod);
+			}else if(habs[i].getX() == x & samereq){
+				toret = colideX(x+habs[i].getWid(),cod);
 			}
 		}
 	}
