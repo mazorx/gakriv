@@ -208,6 +208,7 @@ class hability {
 	setHtml(){
 		this.html = "<div id=\""+this.cod
 		+"\" style=\"position:absolute;"
+		+"background-color:black;"
 		+"left:"+this.x+"px;"
 		+"top:"+this.y+"px;"
 		+"width:"+this.wid+"px;"
