@@ -16,7 +16,7 @@ function load(){
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	//xmlstring = xmlonline;
+	xmlstring = xmlonline;
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
