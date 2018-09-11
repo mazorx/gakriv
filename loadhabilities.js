@@ -10,7 +10,7 @@ var globalhei = 130;
 
 function load(){
   var xmlonline = $.ajax({
-                    url: "https://raw.githubusercontent.com/mazorx/gakriv/master/habilidades.xml",
+                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.xml",
                     async: false
                  }).responseText;
 	
