@@ -87,7 +87,6 @@ function setRows(){
 			rows = rows.concat(conc);
 		}
 	}
-	log(rows);
 }
 
 function setPositions(){
