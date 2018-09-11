@@ -5,7 +5,7 @@ var canvas;
 var rows = [];
 var margin = 25;
 var globalwid = 70;
-var globalhei = 70;
+var globalhei = 130;
 
 
 function load(){
@@ -23,8 +23,21 @@ function load(){
     txt = "";
     x = getTags("hability");
 	habs = new Array(x.length);
-    for (i = 0; i < x.length; i++) {
+	setRows();
+	
+	for(var i = 0; i < x.length; i++){
 		habs[i] = new hability(x[i]);
+	}
+	
+	setPositions();
+	drawAll();
+	
+	//chave(200,300,250,0);
+}
+
+function setRowsPerLevel(){
+	var x = getTags("hability");
+    for (i = 0; i < x.length; i++) {
 		var checkrow = false;
 		for(var r = 0; r < rows.length; r++){
 			if(getTag("reqlvl",i) == rows[r]){
@@ -36,32 +49,81 @@ function load(){
 		}
     }
 	rows.sort();
-	
-	setPositions();
-	drawAll();
-	
-	//chave(200,300,250,0);
+}
+
+function setRows(){
+	rows = getTag("rows",0).split(",");
 }
 
 function setPositions(){
 	//Posições mais basicas
-	for(var i = 0; i < rows.length; i++){
-		var curpos = 1;
-		var currow = rows[i];
+	for(var i = 1; i < rows.length+1; i++){
+		var currow = i;
 		var curx = margin;
 		for(var h = 0; h < habs.length; h++){
 			var hr = -1;
-			if(habs[h].getLvl() == currow){
-				
+			if(habs[h].getRow() == i){
 				habs[h].setX(curx);
-				habs[h].setY((currow-1)*globalhei + margin);
+				habs[h].setY((currow)*globalhei + margin);
 				curx = curx + habs[h].getWid();
-				curpos++;
+				try{
+					if(habs[h].getReqHab().length > 0){
+						var quant = 0;
+						var tot = 0;
+						for(var r = 0; r < habs[h].getReqHab().length; r++){
+							tot += getposX(habs[h].getReqHab()[r]);
+							quant++;
+						}
+						var x = tot / quant;
+						x = x == 0 ? margin : x;
+						x = colideX(x,h);
+						habs[h].setX(x);
+					}
+				}catch(err){
+					//log(err);
+				}
 			}
 		}
 	}
 }
 
+function getposX(cod){
+	for(var i = 0; i < habs.length; i++){
+		if(habs[i].getCod() == cod){
+			return habs[i].getX();
+		}
+	}
+	return 0;
+}
+
+function colideX(x,cod){
+	var toret = x;
+	for(var i = 0; i < habs.length; i++){
+		var samereq = compareReqHab(cod,i);
+		//log(samereq);
+		if(habs[i].getX() == x & samereq){
+			//log(habs[i].getTitle() + ", " + habs[i].getX() + "/" + x);
+			toret = colideX(x+habs[i].getWid(),cod);
+		}
+	}
+	return toret;
+}
+
+function compareReqHab(cod1,cod2){
+	var r1 = habs[cod1].getReqHab();
+	var r2 = habs[cod2].getReqHab();
+	var same = r1.length == r2.length;
+	for(var i = 0; i < r1.length; i++){
+		var ss = false;
+		for(var r = 0; r < r2.length; r2++){
+			if(r1[i] == r2[r]){
+				ss = true;
+			}
+		}
+		same = ss;
+	}
+	return same;
+}
 
 function getSubs(cod){
 	var toret = 0;
@@ -208,7 +270,6 @@ class hability {
 	setHtml(){
 		this.html = "<div id=\""+this.cod
 		+"\" style=\"position:absolute;"
-		+"background-color:black;"
 		+"left:"+this.x+"px;"
 		+"top:"+this.y+"px;"
 		+"width:"+this.wid+"px;"
@@ -216,7 +277,9 @@ class hability {
 		+" class=\"tooltip\"> <img onclick=\"levelup("+this.cod+")\" src=\""
 		+ this.img
 		+"\"/><br/>"
+		+"<div style=\"background-color:black;\">"
 		+this.title
+		+"</div>"
 		+"<span class=\"tooltiptext\">"
 		+this.title
 		+"<br/>TIPO: "
@@ -256,11 +319,11 @@ class hability {
 	}
 	
 	getReqHab(){
-		return reqhab;
+		return this.reqhab;
 	}
 	
 	getTitle(){
-		return reqhabtitle;
+		return this.title;
 	}
 	
 	getLvl(){
@@ -353,7 +416,7 @@ var xmlstring = `<class>
 		<title>
 		Pancada Corporal
 		</title>
-		<row></row>
+		<row>1</row>
 		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
 		<type>
 		Ativa (Ofensiva)
@@ -370,7 +433,7 @@ var xmlstring = `<class>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
 		<title>
-		Pancada Corporal
+		Pancada Bruta
 		</title>
 		<row>1</row>
 		<requires><reqhab></reqhab><reqlvl>1</reqlvl></requires>
@@ -389,7 +452,7 @@ var xmlstring = `<class>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
 		<title>
-		Pancada Corporal
+		Pancada Tancosa
 		</title>
 		<row>2</row>
 		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
@@ -408,7 +471,7 @@ var xmlstring = `<class>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
 		<title>
-		Pancada Corporal
+		Pancada Punk
 		</title>
 		<row>3</row>
 		<requires><reqhab>0</reqhab><reqlvl>3</reqlvl></requires>
@@ -427,7 +490,7 @@ var xmlstring = `<class>
 		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
 		</image>
 		<title>
-		Pancada Corporal
+		Pancada Dancada
 		</title>
 		<row>3</row>
 		<requires><reqhab>4</reqhab><reqlvl>5</reqlvl></requires>
