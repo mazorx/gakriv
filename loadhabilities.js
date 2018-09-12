@@ -1,12 +1,13 @@
 var parser, xmlDoc;
 var habs;
-var levels
 var canvas;
 var rows = [];
 var margin = 25;
 var globalwid = 110;
 var globalhei = 130;
-
+var pontos = 1;
+var levels = 1;
+var loaded = false;
 
 function load(){
   var xmlonline = $.ajax({
@@ -16,7 +17,7 @@ function load(){
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	xmlstring = xmlonline;
+	//xmlstring = xmlonline;
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
@@ -38,8 +39,74 @@ function load(){
 	
 	drawAll();
 	
-	
+	refreshPts();
+	loaded = true;
 	//chave(200,300,250,0);
+}
+
+function click(cod){
+	if(loaded){
+		if(habs[cod].isSelected()){
+			desselectHab(cod);
+		}else{
+			selectHab(cod);
+		}
+		refreshPts();
+	}else{
+	}
+}
+
+function setLevels(){
+	levels = document.getElementById("lvlselect").value;
+	resetPts();
+}
+
+function selectHab(cod){
+	var rh = habs[cod].getReqHab();
+	if(rh != ""){
+		for(var i = 0; i < rh.length; i++){
+			selectHab(rh[i]);
+		}
+		if(pontos > 0 & !habs[cod].isSelected()){
+			pontos--;
+			habs[cod].select();
+		}
+	}else{
+		if(pontos > 0 & !habs[cod].isSelected()){
+			pontos--;
+			habs[cod].select();
+		}
+		stop = true;
+	}
+}
+
+function desselectHab(cod){
+	var subs = false;
+	for(var i = 0; i < habs.length; i++){
+		var rh = habs[i].getReqHab();
+		var todes = false;
+		for(var r = 0; r < rh.length; r++){
+			if(rh[r] == habs[cod].getCod()){
+				desselectHab(i);
+			}
+		}
+	}
+	if(habs[cod].isSelected()){
+		habs[cod].desselect();
+		pontos++;
+	}
+}
+
+function resetPts(){
+	for(var i = 0; i < habs.length; i++){
+		habs[i].desselect();
+	}
+	pontos = levels;
+	refreshPts();
+}
+
+function refreshPts(){
+	document.getElementById("pts").innerHTML = pontos;
 }
 
 function firstWid(){
@@ -189,8 +256,14 @@ function log(str){
 function drawAll(){
 	document.getElementById("habs").innerHTML = "";
 	for(var h = 0; h < habs.length; h++){
-		habs[h].setHtml();
-		document.getElementById("habs").innerHTML = document.getElementById("habs").innerHTML + (habs[h].getHtml());
+		var i = h;
+		habs[i].setHtml();
+		document.getElementById("habs").insertAdjacentHTML('beforeend',habs[i].getHtml());
+		var ccc = habs[i].getCod();
+		document.getElementById("h"+ccc).onclick = function(){
+			var code = this.getAttributeNode("id").value;
+			code = code.substring(1);
+			click(code+"")};
 	}
 	drawAllKeys();
 }
@@ -311,7 +384,6 @@ class hability {
 	}
 	
 	setHtml(){
-	
 	var textshadow = " -1px -1px 4px #000, ";
 	var tsm = 6;
 	var tsfinal = "";
@@ -321,14 +393,14 @@ class hability {
 	}
 	
 	tsfinal = tsfinal.substring(0,tsfinal.length-2);
-	
-		this.html = "<div id=\""+this.cod
+		this.html = "<div id=\"h"+this.cod
 		+"\" style=\"position:absolute;"
 		+"left:"+this.x+"px;"
 		+"top:"+this.y+"px;"
 		+"width:"+this.wid+"px;"
 		+"\""
-		+" class=\"tooltip\"> <div style=\"position:relative;width:50px;left:calc(50% - 25px)\"><img style=\"filter: grayscale("+this.grayscale+"%);\" onclick=\"levelup("+this.cod+")\" src=\""
+		+" class=\"tooltip\"> <div style=\"position:relative;width:50px;left:calc(50% - 25px)\">"
+		+"<img id=\"im"+this.cod+"\" style=\"filter: grayscale("+this.grayscale+"%);\" src=\""
 		+ this.img
 		+"\"/>"
 		+"<div style=\"position:absolute;right:-20px;bottom:-5px;color:yellow;text-shadow: "+tsfinal+";\">LvL "+this.reqlvl+"</div>"
@@ -406,8 +478,8 @@ class hability {
 		return this.html;
 	}
 	
-	getGrayscale(){
-		return this.grayscale;
+	isSelected(){
+		return this.grayscale != 100;
 	}
 	
 	setX(x){
@@ -426,8 +498,16 @@ class hability {
 		this.wid = wid;
 	}
 	
-	setGrayscale(gs){
-		this.grayscale = gs;
+	select(){
+		this.grayscale = 0;
+		var gs = "grayscale("+this.grayscale+"%)";
+		document.getElementById("im"+this.cod).style.filter=gs;
+	}
+	
+	desselect(){
+		this.grayscale = 100;
+		var gs = "grayscale("+this.grayscale+"%)";
+		document.getElementById("im"+this.cod).style.filter=gs;
 	}
 }
 
