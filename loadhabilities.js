@@ -3,7 +3,7 @@ var habs;
 var canvas;
 var rows = [];
 var margin = 25;
-var globalwid = 110;
+var globalwid = 130;
 var globalhei = 130;
 var pontos = 1;
 var levels = 1;
@@ -56,6 +56,7 @@ function load(){
 	
 	drawAll();
 	
+	resetPts();
 	refreshPts();
 	loaded = true;
 	//chave(200,300,250,0);
@@ -416,6 +417,13 @@ class hability {
 		this.img = decode(getTag("image",0,xml));
 		this.title = decode(getTag("title",0,xml));
 		this.type = decode(getTag("type",0,xml));
+		this.cooldown = ""+decode(getTag("cooldown",0,xml));
+		this.mana = "";
+		if(getTag("mana",0,xml)+"" != ""){
+			this.mana = "<b style=\"color:#00f6ff;\">Custo de Mana: </b>" + decode(getTag("mana",0,xml)) + "<br/>";
+		}else{
+			this.mana = "";
+		}
 		this.description = decode(getTag("description",0,xml));
 		this.reqlvl = decode(getTag("reqlvl",0,xml));
 		this.reqhab = getTags("reqhab",xml);
@@ -480,6 +488,9 @@ class hability {
 		+"<br/>TIPO: "
 		+this.type
 		+"<br/><b>"
+		+"Tempo de Recarga: "+this.cooldown
+		+"<br/>"
+		+this.mana
 		+decode("Pré Requisito: ")
 		+this.reqhabtitle + " | Level " + this.reqlvl
 		+"</b><br/>"
@@ -614,7 +625,7 @@ function decode(s) {
 function convert(tsv){
 	var xml = "";
 	
-	var tables = tsv.split("\n--										\n");
+	var tables = tsv.split("\n--											\n");
 	
 	for(var t = 0; t < tables.length; t++){
 		xml +="<class>";
@@ -629,10 +640,11 @@ function convert(tsv){
 			var r1 = vals[4] + "";
 			var r2 = vals[5] + "";
 			var r3 = vals[6] + "";
-			var r4 = vals[7] + "";
-			var lvl = vals[8];
-			var type = vals[9];
-			var desc = vals[10];
+			var cd = vals[8] + "";
+			var mana = vals[8] + "";
+			var lvl = vals[9];
+			var type = vals[10];
+			var desc = vals[11];
 			var reqtext = "";
 			if(r1 != ""){
 				reqtext += "<reqhab>"+r1+"</reqhab>";
@@ -643,9 +655,6 @@ function convert(tsv){
 			if(r3 != ""){
 				reqtext += "<reqhab>"+r3+"</reqhab>";
 			}
-			if(r4 != ""){
-				reqtext += "<reqhab>"+r4+"</reqhab>";
-			}
 			var bracket = `
 			<hability>
 				<cod>`+cod+`</cod>
@@ -655,6 +664,8 @@ function convert(tsv){
 				<requires>`+reqtext+`</requires>
 				<reqlvl>`+lvl+`</reqlvl>
 				<type>`+type+`</type>
+				<cooldown>`+cd+`</cooldown>
+				<mana>`+mana+`</mana>
 				<description>`+desc+`</description>
 			</hability>
 			`;
