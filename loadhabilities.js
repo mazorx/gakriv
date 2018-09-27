@@ -92,7 +92,13 @@ function reload(){
 
 function click(cod){
 	if(loaded){
-		if(habs[cod].isSelected()){
+		var pos;
+		for (var p = 0; p < habs.length; p++){
+			if(habs[p].getCod() == cod){
+				pos = p;
+			}
+		}
+		if(habs[pos].isSelected()){
 			desselectHab(cod);
 		}else{
 			selectHab(cod);
@@ -108,19 +114,25 @@ function setLevels(){
 }
 
 function selectHab(cod){
-	var rh = habs[cod].getReqHab();
+	var pos;
+	for (var p = 0; p < habs.length; p++){
+		if(habs[p].getCod() == cod){
+			pos = p;
+		}
+	}
+	var rh = habs[pos].getReqHab();
 	if(rh != ""){
 		for(var i = 0; i < rh.length; i++){
 			selectHab(rh[i]);
 		}
-		if(pontos > 0 & !habs[cod].isSelected()){
+		if(pontos > 0 & !habs[pos].isSelected()){
 			pontos--;
-			habs[cod].select();
+			habs[pos].select();
 		}
 	}else{
-		if(pontos > 0 & !habs[cod].isSelected()){
+		if(pontos > 0 & !habs[pos].isSelected()){
 			pontos--;
-			habs[cod].select();
+			habs[pos].select();
 		}
 		stop = true;
 	}
@@ -128,17 +140,23 @@ function selectHab(cod){
 
 function desselectHab(cod){
 	var subs = false;
+	var pos;
+	for (var p = 0; p < habs.length; p++){
+		if(habs[p].getCod() == cod){
+			pos = p;
+		}
+	}
 	for(var i = 0; i < habs.length; i++){
 		var rh = habs[i].getReqHab();
 		var todes = false;
 		for(var r = 0; r < rh.length; r++){
-			if(rh[r] == habs[cod].getCod()){
-				desselectHab(i);
+			if(rh[r] == habs[pos].getCod()){
+				desselectHab(habs[i].getCod());
 			}
 		}
 	}
-	if(habs[cod].isSelected()){
-		habs[cod].desselect();
+	if(habs[pos].isSelected()){
+		habs[pos].desselect();
 		pontos++;
 	}
 }
@@ -309,7 +327,8 @@ function drawAll(){
 		document.getElementById("h"+ccc).onclick = function(){
 			var code = this.getAttributeNode("id").value;
 			code = code.substring(1);
-			click(code+"")};
+			click(code+"")
+		};
 	}
 	drawAllKeys();
 }
