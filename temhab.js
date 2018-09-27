@@ -8,6 +8,8 @@ var globalhei = 130;
 var pontos = 1;
 var levels = 1;
 var loaded = false;
+var xmltotal = "";
+var curclass = 0;
 
 function load(){
   var xmlonline = $.ajax({
@@ -22,13 +24,17 @@ function load(){
 	xmltext = document.getElementById("xmlarea").value + "";
 	if(xmltext != ""){
 		if(xmltext.substring(0,7) == "<class>"){
-			xmlfinal = xmltext;
+			xmltotal = xmltext;
 		}else{
-			xmlfinal = convert(xmltext);
+			xmltotal = convert(xmltext);
 		}
 	}else{
-		xmlfinal = xmlstring;
+		xmltotal = xmlstring;
 	}
+	
+	xmlfinal = getTags("class",xmltotal)[curclass];
+	
+	loadclasses();
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
@@ -53,6 +59,16 @@ function load(){
 	refreshPts();
 	loaded = true;
 	//chave(200,300,250,0);
+}
+
+function loadclasses(){
+	var classes = getTags("class",xmltotal);
+	var html = "";
+	for(var i = 0; i < classes.length; i++){
+		var name = getTag("cname",0,classes[i]);
+		var img = getTag("cimg",0,classes[i]);
+		html += "<div id=\""+i+"\" style=\"width:100px;height:100px;filter:grayscale(100%);\""
+	}
 }
 
 function reload(){
@@ -578,13 +594,14 @@ function decode(s) {
 	}
 }
 
-function convert(var tsv){
+function convert(tsv){
 	var xml = "";
 	
 	var tables = tsv.split("\n--										\n");
 	
 	for(var t = 0; t < tables.length; t++){
 		xml +="<class>";
+		xml +="<cname>"+tables[t].split("	")[0]+"</cname><cimg>"+tables[t].split("	")[1]+"</cimg>";
 		var rows = tables[t].split("\n");
 		for(var i = 1; i < rows.length; i++){
 			var vals = rows[i].split("	");
