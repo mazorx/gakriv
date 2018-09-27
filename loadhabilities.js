@@ -417,7 +417,10 @@ class hability {
 		this.img = decode(getTag("image",0,xml));
 		this.title = decode(getTag("title",0,xml));
 		this.type = decode(getTag("type",0,xml));
-		this.cooldown = ""+decode(getTag("cooldown",0,xml));
+		this.cooldown = "";
+		if(getTag("cooldown",0,xml)+"" != ""){
+			this.cooldown = "Tempo de Recarga: "+decode(getTag("cooldown",0,xml)) + "<br/>";
+		}
 		this.mana = "";
 		if(getTag("mana",0,xml)+"" != ""){
 			this.mana = "<b style=\"color:#00f6ff;\">Custo de Mana: </b>" + decode(getTag("mana",0,xml)) + "<br/>";
@@ -488,8 +491,7 @@ class hability {
 		+"<br/>TIPO: "
 		+this.type
 		+"<br/><b>"
-		+"Tempo de Recarga: "+this.cooldown
-		+"<br/>"
+		+this.cooldown
 		+this.mana
 		+decode("Pré Requisito: ")
 		+this.reqhabtitle + " | Level " + this.reqlvl
