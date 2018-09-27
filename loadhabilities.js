@@ -446,7 +446,7 @@ class hability {
 		+"width:"+this.wid+"px;"
 		+"\""
 		+" class=\"tooltip\"> <div style=\"position:relative;width:50px;left:calc(50% - 25px)\">"
-		+"<img id=\"im"+this.cod+"\" style=\"filter: grayscale("+this.grayscale+"%);\" src=\""
+		+"<img id=\"im"+this.cod+"\" style=\"filter: grayscale("+this.grayscale+"%); box-shadow: 0px 0px 0px yellow; \" src=\""
 		+ this.img
 		+"\"/>"
 		+"<div style=\"position:absolute;right:-20px;bottom:-5px;color:yellow;text-shadow: "+tsfinal+";\">LvL "+this.reqlvl+"</div>"
@@ -547,13 +547,20 @@ class hability {
 	select(){
 		this.grayscale = 0;
 		var gs = "grayscale("+this.grayscale+"%)";
+		var color = "rgba(255, 255, 200, 0.2)";
+		var size = "2px"
+		var gausian = "8px";
+		var bs = ""+size+" "+size+" "+gausian+" "+color+", "+size+" -"+size+" "+gausian+" "+color+", -"+size+" -"+size+" "+gausian+" "+color+", -"+size+" "+size+" "+gausian+" "+color+"";
 		document.getElementById("im"+this.cod).style.filter=gs;
+		document.getElementById("im"+this.cod).style["boxShadow"] = bs;
 	}
 	
 	desselect(){
 		this.grayscale = 100;
 		var gs = "grayscale("+this.grayscale+"%)";
+		var bs = "0px 0px 0px yellow";
 		document.getElementById("im"+this.cod).style.filter=gs;
+		document.getElementById("im"+this.cod).style["boxShadow"]=bs;
 	}
 }
 
