@@ -33,11 +33,11 @@
 	
 <body onload="load()" style="background-color:black;color:#fff;">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://rawgit.com/mazorx/gakriv/master/loadhabilities.js"></script>
+<script src="loadhabilities.js"></script>
 
 <body onload="load()" style="background-color:black;color:#fff;">
 
-<div style="color:white;position:absolute; left:20px; top:20px;font-family:verdana;">
+<div style="color:white;position:absolute; left:20px; top:150px;font-family:verdana;">
 <b style="font-size:15pt">Level </b>
 <select id="lvlselect" onchange="setLevels()">
 <option value="1">1</option>
@@ -66,8 +66,11 @@
 <b id="pts"></b>
 </div>
 
-<canvas id="canv" style="position:absolute;top:70px;left:0px;background-color:#000;border-color:#111;border-width:1px;border-style:solid;">Seu navegador nao suporta o canvas, que e responsavel pelas chaves</canvas>
-<div style="position:absolute;top:70px;left:0px;font-family:verdana;font-size:11pt"><p id="habs"></p></div>
+<textarea id="xmlarea" style="width:500px;height:100px;"></textarea>
+<button id="reload" onclick="reload()">Reload</button>
+
+<canvas id="canv" style="position:absolute;top:200px;left:0px;background-color:#000;border-color:#111;border-width:1px;border-style:solid;">Seu navegador nao suporta o canvas, que e responsavel pelas chaves</canvas>
+<div style="position:absolute;top:200px;left:0px;font-family:verdana;font-size:11pt"><p id="habs"></p></div>
 <div style="position:absolute;top:0px;right:0px;color:white; " id="debug"></div>
 
 </body>
