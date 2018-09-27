@@ -56,7 +56,11 @@ function reload(){
 	xmltext = document.getElementById("xmlarea").value + "";
 	//xmlstring = xmlonline;
 	if(xmltext != ""){
-		xmlfinal = xmltext;
+		if(xmltext.substring(0,7) == "<class>"){
+			xmlfinal = xmltext;
+		}else{
+			xmlfinal = convert(xmltext);
+		}
 	}else{
 		xmlfinal = xmlstring;
 	}
@@ -579,6 +583,56 @@ function decode(s) {
 	}
 }
 
+function convert(){
+	var xml = "";
+	xml +="<class>";
+	var tsv = document.getElementById("xmlarea").value + "";
+	var rows = tsv.split("\n");
+	for(var i = 1; i < rows.length; i++){
+		var vals = rows[i].split("	");
+		var cod = vals[0];
+		var img = vals[1];
+		var title = vals[2];
+		var row = vals[3];
+		var r1 = vals[4] + "";
+		var r2 = vals[5] + "";
+		var r3 = vals[6] + "";
+		var r4 = vals[7] + "";
+		var lvl = vals[8];
+		var type = vals[9];
+		var desc = vals[10];
+		var reqtext = "";
+		if(r1 != ""){
+			reqtext += "<reqhab>"+r1+"</reqhab>";
+		}
+		if(r2 != ""){
+			reqtext += "<reqhab>"+r2+"</reqhab>";
+		}
+		if(r3 != ""){
+			reqtext += "<reqhab>"+r3+"</reqhab>";
+		}
+		if(r4 != ""){
+			reqtext += "<reqhab>"+r4+"</reqhab>";
+		}
+		var bracket = `
+		<hability>
+			<cod>`+cod+`</cod>
+			<image>`+img+`</image>
+			<title>`+title+`</title>
+			<row>`+row+`</row>
+			<requires>`+reqtext+`</requires>
+			<reqlvl>`+lvl+`</reqlvl>
+			<type>`+type+`</type>
+			<description>`+desc+`</description>
+		</hability>
+		`;
+		xml += bracket;
+	}
+	
+	xml +="</class>";
+	return xml;
+}
+
 var xmlmodel = `
 	<hability>
 		<cod></cod>
@@ -600,6 +654,8 @@ var xmlmodel = `
 		</description>
 	</hability>
 `;
+
+
 
 var xmlfinal = "";
 
