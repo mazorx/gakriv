@@ -17,7 +17,49 @@ function load(){
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	xmlstring = xmlonline;
+	//xmlstring = xmlonline;
+	xmlfinal = xmlstring;
+	
+	canvas = document.getElementById("canv");
+	canvas.width = screen.width;
+	canvas.height = screen.height;
+	
+    txt = "";
+    x = getTags("hability");
+	habs = new Array(x.length);
+	setRows();
+	
+	for(var i = 0; i < x.length; i++){
+		habs[i] = new hability(x[i]);
+	}
+	
+	setPositions();
+	
+	canvas.width = firstWid() + 150;
+	canvas.height = (rows.length * globalhei) + (margin * 2) + 150;
+	
+	drawAll();
+	
+	refreshPts();
+	loaded = true;
+	//chave(200,300,250,0);
+}
+
+function reload(){
+  var xmlonline = $.ajax({
+                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.xml",
+                    async: false
+                 }).responseText;
+	
+    var x, i, txt, xmlDoc;
+	parser = new DOMParser();
+	xmltext = document.getElementById("xmlarea").value + "";
+	//xmlstring = xmlonline;
+	if(xmltext != ""){
+		xmlfinal = xmltext;
+	}else{
+		xmlfinal = xmlstring;
+	}
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
@@ -268,7 +310,7 @@ function drawAll(){
 	drawAllKeys();
 }
 
-function getTags(tag,xml=xmlstring){
+function getTags(tag,xml=xmlfinal){
 	var c = xml.split("<"+tag+">").length -1;
 	var toret = [];
 	for(var i = 0; i < c; i++){
@@ -285,7 +327,7 @@ function getTags(tag,xml=xmlstring){
 	return toret;
 }
 
-function getTag(tag,i,xml=xmlstring){
+function getTag(tag,i,xml=xmlfinal){
 	var toret = "";
 		var s1 = xml.split("<"+tag+">")[i+1];
 		toret = s1.split("</"+tag+">")[0].replace("	","");
@@ -558,6 +600,8 @@ var xmlmodel = `
 		</description>
 	</hability>
 `;
+
+var xmlfinal = "";
 
 var xmlstring = `<class>
 	<hability>
