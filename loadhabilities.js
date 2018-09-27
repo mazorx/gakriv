@@ -3,7 +3,7 @@ var habs;
 var canvas;
 var rows = [];
 var margin = 25;
-var globalwid = 130;
+var globalwid = 100;
 var globalhei = 130;
 var pontos = 1;
 var levels = 1;
@@ -12,14 +12,13 @@ var xmltotal = "";
 var curclass = 0;
 
 function load(){
-  var xmlonline = $.ajax({
-                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.xml",
+  var tsvonline = $.ajax({
+                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.tsv",
                     async: false
                  }).responseText;
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	//xmlstring = xmlonline;
 	
 	xmltext = document.getElementById("xmlarea").value + "";
 	if(xmltext != ""){
@@ -28,6 +27,8 @@ function load(){
 		}else{
 			xmltotal = convert(xmltext);
 		}
+	}else if(tsvonline != ""){
+		xmltotal = tsvonline;
 	}else{
 		xmltotal = xmlstring;
 	}
@@ -417,6 +418,10 @@ class hability {
 		this.img = decode(getTag("image",0,xml));
 		this.title = decode(getTag("title",0,xml));
 		this.type = decode(getTag("type",0,xml));
+		this.distance = "";
+		if(getTag("distance",0,xml)+"" != ""){
+			this.distance = decode("Alcânce: "+decode(getTag("distance",0,xml)) + "<br/>");
+		}
 		this.cooldown = "";
 		if(getTag("cooldown",0,xml)+"" != ""){
 			this.cooldown = "Tempo de Recarga: "+decode(getTag("cooldown",0,xml)) + "<br/>";
@@ -462,15 +467,16 @@ class hability {
 	}
 	
 	setHtml(){
-	var textshadow = " -1px -1px 4px #000, ";
-	var tsm = 6;
-	var tsfinal = "";
-	
-	for(var i = 0; i < tsm; i++){
-		tsfinal += textshadow;
-	}
-	
-	tsfinal = tsfinal.substring(0,tsfinal.length-2);
+		var textshadow = " -1px -1px 4px #000, ";
+		var tsm = 6;
+		var tsfinal = "";
+		
+		for(var i = 0; i < tsm; i++){
+			tsfinal += textshadow;
+		}
+		
+		tsfinal = tsfinal.substring(0,tsfinal.length-2);
+		
 		this.html = "<div id=\"h"+this.cod
 		+"\" style=\"position:absolute;"
 		+"left:"+this.x+"px;"
@@ -491,6 +497,7 @@ class hability {
 		+"<br/>TIPO: "
 		+this.type
 		+"<br/><b>"
+		+this.distance
 		+this.cooldown
 		+this.mana
 		+decode("Pré Requisito: ")
@@ -627,11 +634,15 @@ function decode(s) {
 function convert(tsv){
 	var xml = "";
 	
-	var tables = tsv.split("\n--											\n");
+	var tables = tsv.split("\n--												\n");
 	
 	for(var t = 0; t < tables.length; t++){
 		xml +="<class>";
-		xml +="<cname>"+tables[t].split("	")[0]+"</cname><cimg>"+tables[t].split("	")[1]+"</cimg>";
+		xml +="<cname>"+tables[t].split("	")[0]+"</cname>";
+		xml +="<cimg>"+tables[t].split("	")[1]+"</cimg>";
+		xml +="<passiva>"+tables[t].split("	")[11]+"</passiva>";
+		xml +="<cdesc>"+tables[t].split("	")[12]+"</cdesc>";
+		
 		var rows = tables[t].split("\n");
 		for(var i = 1; i < rows.length; i++){
 			var vals = rows[i].split("	");
@@ -642,11 +653,12 @@ function convert(tsv){
 			var r1 = vals[4] + "";
 			var r2 = vals[5] + "";
 			var r3 = vals[6] + "";
+			var dist = vals[7] + "";
 			var cd = vals[8] + "";
-			var mana = vals[8] + "";
-			var lvl = vals[9];
-			var type = vals[10];
-			var desc = vals[11];
+			var mana = vals[9] + "";
+			var lvl = vals[10];
+			var type = vals[11];
+			var desc = vals[12];
 			var reqtext = "";
 			if(r1 != ""){
 				reqtext += "<reqhab>"+r1+"</reqhab>";
@@ -667,6 +679,7 @@ function convert(tsv){
 				<reqlvl>`+lvl+`</reqlvl>
 				<type>`+type+`</type>
 				<cooldown>`+cd+`</cooldown>
+				<distance>`+dist+`</distance>
 				<mana>`+mana+`</mana>
 				<description>`+desc+`</description>
 			</hability>
