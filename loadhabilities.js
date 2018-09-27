@@ -8,6 +8,8 @@ var globalhei = 130;
 var pontos = 1;
 var levels = 1;
 var loaded = false;
+var xmltotal = "";
+var curclass = 0;
 
 function load(){
   var xmlonline = $.ajax({
@@ -18,7 +20,19 @@ function load(){
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
 	//xmlstring = xmlonline;
-	xmlfinal = xmlstring;
+	
+	xmltext = document.getElementById("xmlarea").value + "";
+	if(xmltext != ""){
+		if(xmltext.substring(0,7) == "<class>"){
+			xmltotal = xmltext;
+		}else{
+			xmltotal = convert(xmltext);
+		}
+	}else{
+		xmltotal = xmlstring;
+	}
+	
+	xmlfinal = getTags("class",xmltotal)[curclass];
 	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
@@ -46,48 +60,7 @@ function load(){
 }
 
 function reload(){
-  var xmlonline = $.ajax({
-                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.xml",
-                    async: false
-                 }).responseText;
-	
-    var x, i, txt, xmlDoc;
-	parser = new DOMParser();
-	xmltext = document.getElementById("xmlarea").value + "";
-	//xmlstring = xmlonline;
-	if(xmltext != ""){
-		if(xmltext.substring(0,7) == "<class>"){
-			xmlfinal = xmltext;
-		}else{
-			xmlfinal = convert(xmltext);
-		}
-	}else{
-		xmlfinal = xmlstring;
-	}
-	
-	canvas = document.getElementById("canv");
-	canvas.width = screen.width;
-	canvas.height = screen.height;
-	
-    txt = "";
-    x = getTags("hability");
-	habs = new Array(x.length);
-	setRows();
-	
-	for(var i = 0; i < x.length; i++){
-		habs[i] = new hability(x[i]);
-	}
-	
-	setPositions();
-	
-	canvas.width = firstWid() + 150;
-	canvas.height = (rows.length * globalhei) + (margin * 2) + 150;
-	
-	drawAll();
-	
-	refreshPts();
-	loaded = true;
-	//chave(200,300,250,0);
+	load();
 }
 
 function click(cod){
@@ -609,53 +582,59 @@ function decode(s) {
 	}
 }
 
-function convert(){
+function convert(tsv){
 	var xml = "";
-	xml +="<class>";
-	var tsv = document.getElementById("xmlarea").value + "";
-	var rows = tsv.split("\n");
-	for(var i = 1; i < rows.length; i++){
-		var vals = rows[i].split("	");
-		var cod = vals[0];
-		var img = vals[1];
-		var title = vals[2];
-		var row = vals[3];
-		var r1 = vals[4] + "";
-		var r2 = vals[5] + "";
-		var r3 = vals[6] + "";
-		var r4 = vals[7] + "";
-		var lvl = vals[8];
-		var type = vals[9];
-		var desc = vals[10];
-		var reqtext = "";
-		if(r1 != ""){
-			reqtext += "<reqhab>"+r1+"</reqhab>";
+	
+	var tables = tsv.split("\n--										\n");
+	
+	for(var t = 0; t < tables.length; t++){
+		xml +="<class>";
+		xml +="<cname>"+tables[t].split("	")[0]+"</cname><cimg>"+tables[t].split("	")[1]+"</cimg>";
+		var rows = tables[t].split("\n");
+		for(var i = 1; i < rows.length; i++){
+			var vals = rows[i].split("	");
+			var cod = vals[0];
+			var img = vals[1];
+			var title = vals[2];
+			var row = vals[3];
+			var r1 = vals[4] + "";
+			var r2 = vals[5] + "";
+			var r3 = vals[6] + "";
+			var r4 = vals[7] + "";
+			var lvl = vals[8];
+			var type = vals[9];
+			var desc = vals[10];
+			var reqtext = "";
+			if(r1 != ""){
+				reqtext += "<reqhab>"+r1+"</reqhab>";
+			}
+			if(r2 != ""){
+				reqtext += "<reqhab>"+r2+"</reqhab>";
+			}
+			if(r3 != ""){
+				reqtext += "<reqhab>"+r3+"</reqhab>";
+			}
+			if(r4 != ""){
+				reqtext += "<reqhab>"+r4+"</reqhab>";
+			}
+			var bracket = `
+			<hability>
+				<cod>`+cod+`</cod>
+				<image>`+img+`</image>
+				<title>`+title+`</title>
+				<row>`+row+`</row>
+				<requires>`+reqtext+`</requires>
+				<reqlvl>`+lvl+`</reqlvl>
+				<type>`+type+`</type>
+				<description>`+desc+`</description>
+			</hability>
+			`;
+			xml += bracket;
 		}
-		if(r2 != ""){
-			reqtext += "<reqhab>"+r2+"</reqhab>";
-		}
-		if(r3 != ""){
-			reqtext += "<reqhab>"+r3+"</reqhab>";
-		}
-		if(r4 != ""){
-			reqtext += "<reqhab>"+r4+"</reqhab>";
-		}
-		var bracket = `
-		<hability>
-			<cod>`+cod+`</cod>
-			<image>`+img+`</image>
-			<title>`+title+`</title>
-			<row>`+row+`</row>
-			<requires>`+reqtext+`</requires>
-			<reqlvl>`+lvl+`</reqlvl>
-			<type>`+type+`</type>
-			<description>`+desc+`</description>
-		</hability>
-		`;
-		xml += bracket;
+		xml +="</class>";
 	}
 	
-	xml +="</class>";
+	
 	return xml;
 }
 
