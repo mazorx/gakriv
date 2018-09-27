@@ -34,6 +34,8 @@ function load(){
 	
 	xmlfinal = getTags("class",xmltotal)[curclass];
 	
+	loadclasses();
+	
 	canvas = document.getElementById("canv");
 	canvas.width = screen.width;
 	canvas.height = screen.height;
@@ -57,6 +59,33 @@ function load(){
 	refreshPts();
 	loaded = true;
 	//chave(200,300,250,0);
+}
+
+function loadclasses(){
+	var classes = getTags("class",xmltotal);
+	var html = "";
+	
+	for(var i = 0; i < classes.length; i++){
+		try{
+			var name = getTag("cname",0,classes[i]);
+			var img = getTag("cimg",0,classes[i]);
+			var gs = 100;
+			if(curclass == i){
+				gs = 0;
+			}
+			html += `<div id="`+i+`" onclick="sClass(`+i+`)" style="float:left;text-align:center;width:100px;height:100px;filter:grayscale(`+gs+`%);">
+			<img src="`+img+`"></img><br/>
+			`+name+`
+			</div>`;
+		}catch(err){
+		}
+	}
+	document.getElementById("classes").innerHTML = html;
+}
+
+function sClass(c){
+	curclass = c;
+	load();
 }
 
 function reload(){
@@ -664,176 +693,5 @@ var xmlmodel = `
 
 var xmlfinal = "";
 
-var xmlstring = `<class>
-	<hability>
-		<cod>0</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0114.jpg
-		</image>
-		<title>
-		Defender Impacto
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>Ativa (Defensiva)</type>
-		<description>
-		Ganhe +1 permanente para usar o movimento Defender.
-		</description>
-	</hability>
-	<hability>
-		<cod>1</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
-		</image>
-		<title>
-		Pancada Corporal
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Ativa (Ofensiva)
-		</type>
-		<description>
-		Usa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
-		</description>
-	</hability>
-	<hability>
-		<cod>2</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0314.jpg
-		</image>
-		<title>
-		Reforçar Armadura
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Aumenta permanentemente a Armadura em +1.
-		</description>
-	</hability>
-	<hability>
-		<cod>3</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0414.jpg
-		</image>
-		<title>
-		Reforçar Defesa Mágica
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Aumenta permanentemente a Defesa Mágica em +1.
-		</description>
-	</hability>
-	<hability>
-		<cod>4</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0514.jpg
-		</image>
-		<title>
-		Vitalidade
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>2</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Ganha +1 de HP máximo para cada 2 níveis.
-		</description>
-	</hability>
-	<hability>
-		<cod>5</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0614.jpg
-		</image>
-		<title>
-		Força de Espírito
-		</title>
-		<row>2</row>
-		<requires>
-		<reqhab>4</reqhab>
-		<reqlvl>2</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Regenera 1 de vida por turno para cada 10 pontos de HP máximo.
-		</description>
-	</hability>
-	<hability>
-		<cod>6</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0714.jpg
-		</image>
-		<title>
-		Revestir
-		</title>
-		<row>2</row>
-		<requires>
-		<reqhab>2</reqhab>
-		<reqhab>3</reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Ativa (Defensiva)
-		</type>
-		<description>
-		Aumenta o bônus de Reforçar Armadura e Reforçar Defesa Mágica por +1 por 2 turnos.
-		</description>
-	</hability>
-	<hability>
-		<cod>7</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0815.jpg
-		</image>
-		<title>
-		Pancada Estonteante
-		</title>
-		<row>4</row>
-		<requires>
-		<reqhab>1</reqhab>
-		<reqlvl>5</reqlvl></requires>
-		<type>
-		Ativa (Ofensiva)
-		</type>
-		<description>
-		Dá uma pancada forte no corpo de um oponente que lhe joga para longe e causa 1d8 de dano.
-		</description>
-	</hability>
-	<hability>
-		<cod>8</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0914.jpg
-		</image>
-		<title>
-		Escudo Refletor
-		</title>
-		<row>4</row>
-		<requires>
-		<reqhab>0</reqhab>
-		<reqlvl>5</reqlvl></requires>
-		<type>
-		Ativa (Utilitária)
-		</type>
-		<description>
-		Ao ativar esta habilidade, ela durará por 3 turnos e devolverá 1d4 para cado dano recebido ao atacante automaticamente (se o atacante acertar a pancada no Tank, ele sofrerá o dano de retorno sem precisar de rolagem).
-		</description>
-	</hability>
-</class>
+var xmlstring = `
 `;
