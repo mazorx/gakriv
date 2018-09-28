@@ -92,8 +92,8 @@ function loadUrl(){
 		}
 		try{
 			var allsel = url.split("selected=")[1].split("&")[0];
-			if(allsel.split("%2").length > 1){
-				var sel = allsel.split("%2");
+			if(allsel.split("%2C").length > 1){
+				var sel = allsel.split("%2C");
 			}else{
 				var sel = allsel.split(",");
 			}
