@@ -79,23 +79,24 @@ function loadUrl(){
 	if(!urlloaded){
 		urlloaded = true;
 		var url = window.location.href;
+		
 		var curc = "";
 		var lvl = "";
 		var sel = [];
 		try{
-			var curc = url.split("curclass=")[1].split("~")[0];
+			var curc = url.split("curclass=")[1].split("&")[0];
 		}catch{
 		}
 		if(curc == ""){
 			curc = 0;
 		}
 		try{
-			var allsel = url.split("selected=")[1].split("~")[0];
+			var allsel = url.split("selected=")[1].split("&")[0];
 			var sel = allsel.split(",");
 		}catch{
 		}
 		try{
-			var lvl = url.split("level=")[1].split("~")[0];
+			var lvl = url.split("level=")[1].split("&")[0];
 		}catch{
 		}
 		if(lvl == ""){
@@ -128,8 +129,8 @@ function restate(){
 function save(){
 	try{
 		var curp = "?";
-		curp += "curclass="+curclass+"~";
-		curp += "level="+levels+"~";
+		curp += "curclass="+curclass+"&";
+		curp += "level="+levels+"&";
 		curp += "selected=";
 		var sel = 0;
 		for (var i = 0; i < habs.length; i++){
@@ -139,7 +140,7 @@ function save(){
 			}
 		}
 		if(sel>0){
-			curp = curp.substring(0,curp.length-1) + "~";
+			curp = curp.substring(0,curp.length-1) + "&";
 		}else{
 			curp = curp.substring(0,curp.length-9);
 		}
