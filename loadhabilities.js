@@ -86,6 +86,9 @@ function loadUrl(){
 			var curc = url.split("curclass=")[1].split("|")[0];
 		}catch{
 		}
+		if(curc == ""){
+			curc = 0;
+		}
 		try{
 			var allsel = url.split("selected=")[1].split("|")[0];
 			var sel = allsel.split(",");
@@ -94,6 +97,9 @@ function loadUrl(){
 		try{
 			var lvl = url.split("level=")[1].split("|")[0];
 		}catch{
+		}
+		if(lvl == ""){
+			lvl = 1;
 		}
 		sClass(curc);
 		document.getElementById("lvlselect").selectedIndex = lvl-1;
