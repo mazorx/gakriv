@@ -3,7 +3,7 @@ var habs;
 var canvas;
 var rows = [];
 var margin = 25;
-var globalwid = 100;
+var globalwid = 120;
 var globalhei = 130;
 var pontos = 1;
 var levels = 1;
