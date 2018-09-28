@@ -27,8 +27,8 @@ function load(){
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	
-	xmltext = document.getElementById("xmlarea").value + "";
+	var xmltext = "";
+	//xmltext = document.getElementById("xmlarea").value + "";
 	if(xmltext != ""){
 		if(xmltext.substring(0,7) == "<class>"){
 			xmltotal = xmltext;
@@ -106,7 +106,17 @@ function loadUrl(){
 			}catch(err){
 			}
 		}
+		document.getElementById("pts").innerHTML = pontos;
 	}
+}
+
+function restate(){
+	curclass = 0;
+	levels = 1;
+	pontos = 1;
+	document.getElementById("lvlselect").selectedIndex = levels-1;
+	sClass(curclass);
+	setLevels();
 }
 
 function save(){
@@ -143,12 +153,24 @@ function loadclasses(){
 			var name = getTag("cname",0,classes[i]);
 			var img = getTag("cimg",0,classes[i]);
 			cdesc = cdesc.concat(decode(getTag("cdesc",0,classes[i]) + "<br/>" + getTag("passiva",0,classes[i])));
-			var gs = 100;
+			var bs = "";
+			var gs = 0;
 			if(curclass == i){
-				gs = 0;
+				var bs = "box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 1);";
 			}
-			html += `<div id="`+i+`" onclick="sClass(`+i+`)" style="display:inline-block;text-align:center;width:100px;height:100px;filter:grayscale(`+gs+`%);">
-			<img src="`+img+`"></img><br/>
+			html += `<div id="`+i+`" onclick="sClass(`+i+`)" style="display:inline-block;
+			text-align:center;
+			width:110px;
+			height:110px;
+			border-radius: 50px;
+			
+			filter:grayscale(`+gs+`%);">
+			<img style="
+			width:100px;
+			height:100px;
+			border-radius: 50px;
+			`+bs+`"
+			src="`+img+`"></img><br/>
 			`+name+`
 			</div>`;
 		}catch(err){
