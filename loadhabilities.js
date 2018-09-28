@@ -11,6 +11,8 @@ var loaded = false;
 var xmltotal = "";
 var curclass = 0;
 var cdesc = [];
+var urlparams = "";
+var defurl = window.location.href;
 
 function load(){
 	var tsvonline = "";
@@ -20,7 +22,6 @@ function load(){
 			async: false
 		}).responseText;
 	}catch(err){
-		
 	}
 	
     var x, i, txt, xmlDoc;
@@ -71,6 +72,31 @@ function load(){
 	sincPosition();
 }
 
+function save(){
+	try{
+		var curp = "?";
+		curp += "curclass="+curclass+"|"
+		curp += "selected="
+		var sel = 0;
+		for (var i = 0; i < habs.length; i++){
+			if(habs.isSelected()){
+				sel++;
+				curp += i+",";
+			}
+		}
+		if(sel>0){
+			curp = curp.substring(0,curp.length-1) + "|";
+		}else{
+			curp = curp.substring(0,curp.length-9);
+		}
+		
+		curp = curp.substring(0,curp.length-1);
+		window.history.replaceState('Hability Viewer', 'Hability Viewer', curp);
+	}catch(err){
+		
+	}
+}
+
 function loadclasses(){
 	var classes = getTags("class",xmltotal);
 	var html = "";
@@ -92,6 +118,7 @@ function loadclasses(){
 		}
 	}
 	document.getElementById("classes").innerHTML = html;
+	save();
 }
 
 function sincPosition(){
@@ -131,6 +158,7 @@ function click(cod){
 		refreshPts();
 	}else{
 	}
+	save();
 }
 
 function setLevels(){
@@ -650,6 +678,69 @@ function decode(s) {
 	}catch(err){
 		return s;
 	}
+}
+
+
+function getAllUrlParams(url) {
+
+  // get query string from url (optional) or window
+  var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+
+  // we'll store the parameters here
+  var obj = {};
+
+  // if query string exists
+  if (queryString) {
+
+    // stuff after # is not part of query string, so get rid of it
+    queryString = queryString.split('#')[0];
+
+    // split our query string into its component parts
+    var arr = queryString.split('&');
+
+    for (var i=0; i<arr.length; i++) {
+      // separate the keys and the values
+      var a = arr[i].split('=');
+
+      // in case params look like: list[]=thing1&list[]=thing2
+      var paramNum = undefined;
+      var paramName = a[0].replace(/\[\d*\]/, function(v) {
+        paramNum = v.slice(1,-1);
+        return '';
+      });
+
+      // set parameter value (use 'true' if empty)
+      var paramValue = typeof(a[1])==='undefined' ? true : a[1];
+
+      // (optional) keep case consistent
+      paramName = paramName.toLowerCase();
+      paramValue = paramValue.toLowerCase();
+
+      // if parameter name already exists
+      if (obj[paramName]) {
+        // convert value to array (if still string)
+        if (typeof obj[paramName] === 'string') {
+          obj[paramName] = [obj[paramName]];
+        }
+        // if no array index number specified...
+        if (typeof paramNum === 'undefined') {
+          // put the value on the end of the array
+          obj[paramName].push(paramValue);
+        }
+        // if array index number specified...
+        else {
+          // put the value at that index number
+          obj[paramName][paramNum] = paramValue;
+        }
+      }
+      // if param name doesn't exist yet, set it
+      else {
+        obj[paramName] = paramValue;
+      }
+    }
+  }
+
+  return obj;
 }
 
 function convert(tsv){
