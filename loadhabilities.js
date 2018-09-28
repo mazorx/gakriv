@@ -244,12 +244,12 @@ function selectHab(cod){
 		for(var i = 0; i < rh.length; i++){
 			selectHab(rh[i]);
 		}
-		if(pontos > 0 & !habs[pos].isSelected() & levels >= habs[pos].reqlvl){
+		if(pontos > 0 & !habs[pos].isSelected() & levels >= parseInt(habs[pos].reqlvl)){
 			pontos--;
 			habs[pos].select();
 		}
 	}else{
-		if(pontos > 0 & !habs[pos].isSelected() & levels >= habs[pos].reqlvl){
+		if(pontos > 0 & !habs[pos].isSelected() & levels >= parseInt(habs[pos].reqlvl)){
 			pontos--;
 			habs[pos].select();
 		}
