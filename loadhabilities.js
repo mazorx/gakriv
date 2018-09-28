@@ -92,7 +92,11 @@ function loadUrl(){
 		}
 		try{
 			var allsel = url.split("selected=")[1].split("&")[0];
-			var sel = allsel.split(",");
+			if(allsel.split("%2").length > 1){
+				var sel = allsel.split("%2");
+			}else{
+				var sel = allsel.split(",");
+			}
 		}catch{
 		}
 		try{
