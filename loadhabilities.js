@@ -12,7 +12,8 @@ var xmltotal = "";
 var curclass = 0;
 var cdesc = [];
 var urlparams = "";
-var defurl = window.location.href;
+var urlloaded = false;
+var url = window.location.href;
 
 function load(){
 	var tsvonline = "";
@@ -70,16 +71,53 @@ function load(){
 	//chave(200,300,250,0);
 	
 	sincPosition();
+	loadUrl();
+	save();
+}
+
+function loadUrl(){
+	if(!urlloaded){
+		urlloaded = true;
+		var url = window.location.href;
+		var curc = "";
+		var lvl = "";
+		var sel = [];
+		try{
+			var curc = url.split("curclass=")[1].split("|")[0];
+		}catch{
+		}
+		try{
+			var allsel = url.split("selected=")[1].split("|")[0];
+			var sel = allsel.split(",");
+		}catch{
+		}
+		try{
+			var lvl = url.split("level=")[1].split("|")[0];
+		}catch{
+		}
+		sClass(curc);
+		document.getElementById("lvlselect").selectedIndex = lvl-1;
+		levels = lvl;
+		pontos = lvl;
+		setLevels();
+		for(var i = 0; i < sel.length; i++){
+			try{
+				selectHab(habs[sel[i]].getCod());
+			}catch(err){
+			}
+		}
+	}
 }
 
 function save(){
 	try{
 		var curp = "?";
-		curp += "curclass="+curclass+"|"
-		curp += "selected="
+		curp += "curclass="+curclass+"|";
+		curp += "level="+levels+"|";
+		curp += "selected=";
 		var sel = 0;
 		for (var i = 0; i < habs.length; i++){
-			if(habs.isSelected()){
+			if(habs[i].isSelected()){
 				sel++;
 				curp += i+",";
 			}
@@ -91,9 +129,8 @@ function save(){
 		}
 		
 		curp = curp.substring(0,curp.length-1);
-		window.history.replaceState('Hability Viewer', 'Hability Viewer', curp);
+		window.history.pushState('Hability Viewer', 'Hability Viewer', curp);
 	}catch(err){
-		
 	}
 }
 
@@ -118,7 +155,6 @@ function loadclasses(){
 		}
 	}
 	document.getElementById("classes").innerHTML = html;
-	save();
 }
 
 function sincPosition(){
@@ -136,6 +172,7 @@ function sClass(c){
 		document.getElementById("cadd").innerHTML = cdesc[curclass];
 	}
 	load();
+	save();
 }
 
 function reload(){
@@ -164,6 +201,7 @@ function click(cod){
 function setLevels(){
 	levels = document.getElementById("lvlselect").value;
 	resetPts();
+	save();
 }
 
 function selectHab(cod){
@@ -269,7 +307,6 @@ function setRows(){
 	for(var i = 0; i < rquant; i++){
 		rows = rows.concat(i+1);
 	}
-	//log(rows);
 }
 
 function setPositions(){
@@ -297,7 +334,6 @@ function setPositions(){
 						habs[h].setX(x);
 					}
 				}catch(err){
-					//log(err);
 				}
 			}
 		}
@@ -318,7 +354,6 @@ function colideX(x,cod){
 	var y = habs[cod].getY();
 	for(var i = 0; i < habs.length; i++){
 		var samereq = compareReqHab(cod,i);
-		//log(samereq);
 		if(habs[i].getCod() != habs[cod].getCod() & habs[cod].getCod() != 0){
 			if((habs[i].getX() <= x & habs[i].getX() + habs[i].getWid() >= x) &
 				(habs[i].getY() <= y & habs[i].getY() + globalhei > y)){
@@ -510,7 +545,6 @@ class hability {
 			this.reqhabtitle = this.reqhabtitle.substring(0,this.reqhabtitle.length-2);
 		}
 		catch(err){
-			//log(err);
 		}
 		this.setHtml();
 	}
