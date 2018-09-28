@@ -34,7 +34,7 @@ function load(){
 			xmltotal = convert(xmltext);
 		}
 	}else if(tsvonline != ""){
-		xmltotal = tsvonline;
+		xmltotal = convert(tsvonline);
 	}else{
 		xmltotal = xmlstring;
 	}
