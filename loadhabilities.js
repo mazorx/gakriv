@@ -655,62 +655,62 @@ function decode(s) {
 function convert(tsv){
 	var xml = "";
 	
-	var tables = tsv.split("\n--												\n");
+	var tables = tsv.split("\n--												");
 	
 	for(var t = 0; t < tables.length; t++){
-		xml +="<class>";
-		xml +="<cname>"+tables[t].split("	")[0]+"</cname>";
-		xml +="<cimg>"+tables[t].split("	")[1]+"</cimg>";
-		xml +="<passiva>"+tables[t].split("	")[11]+"</passiva>";
-		xml +="<cdesc>"+tables[t].split("	")[12]+"</cdesc>";
-		
-		var rows = tables[t].split("\n");
-		for(var i = 1; i < rows.length; i++){
-			var vals = rows[i].split("	");
-			var cod = vals[0];
-			var img = vals[1];
-			var title = vals[2];
-			var row = vals[3];
-			var r1 = vals[4] + "";
-			var r2 = vals[5] + "";
-			var r3 = vals[6] + "";
-			var dist = vals[7] + "";
-			var cd = vals[8] + "";
-			var mana = vals[9] + "";
-			var lvl = vals[10];
-			var type = vals[11];
-			var desc = vals[12];
-			var reqtext = "";
-			if(r1 != ""){
-				reqtext += "<reqhab>"+r1+"</reqhab>";
+		if(tables[t].length > 4){
+			xml +="<class>";
+			xml +="<cname>"+tables[t].split("	")[0]+"</cname>";
+			xml +="<cimg>"+tables[t].split("	")[1]+"</cimg>";
+			xml +="<passiva>"+tables[t].split("	")[11]+"</passiva>";
+			xml +="<cdesc>"+tables[t].split("	")[12]+"</cdesc>";
+			
+			var rows = tables[t].split("\n");
+			for(var i = 1; i < rows.length; i++){
+				var vals = rows[i].split("	");
+				var cod = vals[0];
+				var img = vals[1];
+				var title = vals[2];
+				var row = vals[3];
+				var r1 = vals[4] + "";
+				var r2 = vals[5] + "";
+				var r3 = vals[6] + "";
+				var dist = vals[7] + "";
+				var cd = vals[8] + "";
+				var mana = vals[9] + "";
+				var lvl = vals[10];
+				var type = vals[11];
+				var desc = vals[12];
+				var reqtext = "";
+				if(r1 != ""){
+					reqtext += "<reqhab>"+r1+"</reqhab>";
+				}
+				if(r2 != ""){
+					reqtext += "<reqhab>"+r2+"</reqhab>";
+				}
+				if(r3 != ""){
+					reqtext += "<reqhab>"+r3+"</reqhab>";
+				}
+				var bracket = `
+				<hability>
+					<cod>`+cod+`</cod>
+					<image>`+img+`</image>
+					<title>`+title+`</title>
+					<row>`+row+`</row>
+					<requires>`+reqtext+`</requires>
+					<reqlvl>`+lvl+`</reqlvl>
+					<type>`+type+`</type>
+					<cooldown>`+cd+`</cooldown>
+					<distance>`+dist+`</distance>
+					<mana>`+mana+`</mana>
+					<description>`+desc+`</description>
+				</hability>
+				`;
+				xml += bracket;
 			}
-			if(r2 != ""){
-				reqtext += "<reqhab>"+r2+"</reqhab>";
-			}
-			if(r3 != ""){
-				reqtext += "<reqhab>"+r3+"</reqhab>";
-			}
-			var bracket = `
-			<hability>
-				<cod>`+cod+`</cod>
-				<image>`+img+`</image>
-				<title>`+title+`</title>
-				<row>`+row+`</row>
-				<requires>`+reqtext+`</requires>
-				<reqlvl>`+lvl+`</reqlvl>
-				<type>`+type+`</type>
-				<cooldown>`+cd+`</cooldown>
-				<distance>`+dist+`</distance>
-				<mana>`+mana+`</mana>
-				<description>`+desc+`</description>
-			</hability>
-			`;
-			xml += bracket;
+			xml +="</class>";
 		}
-		xml +="</class>";
 	}
-	
-	
 	return xml;
 }
 
