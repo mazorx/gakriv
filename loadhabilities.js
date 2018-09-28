@@ -10,12 +10,18 @@ var levels = 1;
 var loaded = false;
 var xmltotal = "";
 var curclass = 0;
+var cdesc = [];
 
 function load(){
-  var tsvonline = $.ajax({
-                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.tsv",
-                    async: false
-                 }).responseText;
+	var tsvonline = "";
+	try{
+		tsvonline = $.ajax({
+			url: "https://rawgit.com/mazorx/gakriv/master/habilidades.tsv",
+			async: false
+		}).responseText;
+	}catch(err){
+		
+	}
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
@@ -61,21 +67,24 @@ function load(){
 	refreshPts();
 	loaded = true;
 	//chave(200,300,250,0);
+	
+	sincPosition();
 }
 
 function loadclasses(){
 	var classes = getTags("class",xmltotal);
 	var html = "";
-	
+	cdesc = [];
 	for(var i = 0; i < classes.length; i++){
 		try{
 			var name = getTag("cname",0,classes[i]);
 			var img = getTag("cimg",0,classes[i]);
+			cdesc = cdesc.concat(decode(getTag("cdesc",0,classes[i]) + "<br/>" + getTag("passiva",0,classes[i])));
 			var gs = 100;
 			if(curclass == i){
 				gs = 0;
 			}
-			html += `<div id="`+i+`" onclick="sClass(`+i+`)" style="float:left;text-align:center;width:100px;height:100px;filter:grayscale(`+gs+`%);">
+			html += `<div id="`+i+`" onclick="sClass(`+i+`)" style="display:inline-block;text-align:center;width:100px;height:100px;filter:grayscale(`+gs+`%);">
 			<img src="`+img+`"></img><br/>
 			`+name+`
 			</div>`;
@@ -85,8 +94,20 @@ function loadclasses(){
 	document.getElementById("classes").innerHTML = html;
 }
 
+function sincPosition(){
+	if(cdesc.length > 0){
+		document.getElementById("cadd").innerHTML = cdesc[curclass];
+		var x = $("#canv").offset();
+		document.getElementById("habs").style.top = x.top +"px";
+	}
+	setTimeout(sincPosition, 100);
+}
+
 function sClass(c){
 	curclass = c;
+	if(cdesc.length > 0){
+		document.getElementById("cadd").innerHTML = cdesc[curclass];
+	}
 	load();
 }
 
