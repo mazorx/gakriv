@@ -41,7 +41,13 @@
 <textarea id="xmlarea" style="width:500px;height:30px;"></textarea>
 <button id="reload" onclick="reload()">Reload</button>
 
-<div style="color:white;position:absolute; left:20px; top:180px;font-family:verdana;">
+
+
+<div style="clear:both;font-family:verdana;font-size:11pt;width:100%;" id="classes"></div>
+<br/>
+<div style="font-family:verdana;font-size:11pt;width:100%" id="cadd"></div>
+<br/>
+<div style="color:white; font-family:verdana;">
 <b style="font-size:15pt">Level </b>
 <select id="lvlselect" onchange="setLevels()">
 <option value="1">1</option>
@@ -69,11 +75,10 @@
 <b style="font-size:11pt">Pontos: </b>
 <b id="pts"></b>
 </div>
+<br/>
 
-<div style="position:absolute;top:40px;left:0px;font-family:verdana;font-size:11pt"><p id="classes"></p></div>
-
-<canvas id="canv" style="position:absolute;top:230px;left:0px;background-color:#000;border-color:#111;border-width:1px;border-style:solid;">Seu navegador nao suporta o canvas, que e responsavel pelas chaves</canvas>
-<div style="position:absolute;top:230px;left:0px;font-family:verdana;font-size:11pt"><p id="habs"></p></div>
+<canvas id="canv" style="float:left;background-color:#000;border-color:#111;border-width:1px;border-style:solid;">Seu navegador nao suporta o canvas, que e responsavel pelas chaves</canvas>
+<div style="position:absolute;top:230px;left:0px;font-family:verdana;font-size:11pt" id="habs"></div>
 <div style="position:absolute;top:0px;right:0px;color:white; " id="debug"></div>
 
 </body>
