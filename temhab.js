@@ -3,31 +3,59 @@ var habs;
 var canvas;
 var rows = [];
 var margin = 25;
-var globalwid = 110;
+var globalwid = 120;
 var globalhei = 130;
 var pontos = 1;
 var levels = 1;
 var loaded = false;
 var xmltotal = "";
 var curclass = 0;
+var cdesc = [];
+var urlparams = "";
+var urlloaded = false;
+var url = window.location.href;
+
+function httpGet(url){
+	try{
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+				console.log("Didthething");
+				return xmlhttp.responseText;
+			}
+		}
+		xmlhttp.open("GET", theUrl, false );
+		xmlhttp.send();
+	}catch(err){
+	}
+}
 
 function load(){
-  var xmlonline = $.ajax({
-                    url: "https://rawgit.com/mazorx/gakriv/master/habilidades.xml",
-                    async: false
-                 }).responseText;
+	var tsvonline = "";
+	tsvonline = httpGet("https://rawgit.com/mazorx/gakriv/master/habilidades.tsv");
+	
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
-	//xmlstring = xmlonline;
-	
-	xmltext = document.getElementById("xmlarea").value + "";
+	var xmltext = "";
+	//xmltext = document.getElementById("xmlarea").value + "";
 	if(xmltext != ""){
 		if(xmltext.substring(0,7) == "<class>"){
 			xmltotal = xmltext;
 		}else{
 			xmltotal = convert(xmltext);
 		}
+	}else if(tsvonline != ""){
+		xmltotal = convert(tsvonline);
 	}else{
 		xmltotal = xmlstring;
 	}
@@ -56,19 +84,147 @@ function load(){
 	
 	drawAll();
 	
+	resetPts();
 	refreshPts();
 	loaded = true;
 	//chave(200,300,250,0);
+	
+	sincPosition();
+	loadUrl();
+	save();
+}
+
+function loadUrl(){
+	if(!urlloaded){
+		urlloaded = true;
+		var url = window.location.href;
+		
+		var curc = "";
+		var lvl = "";
+		var sel = [];
+		try{
+			var curc = url.split("curclass=")[1].split("&")[0];
+		}catch{
+		}
+		if(curc == ""){
+			curc = 0;
+		}
+		try{
+			var allsel = url.split("selected=")[1].split("&")[0];
+			if(allsel.split("%2C").length > 1){
+				var sel = allsel.split("%2C");
+			}else{
+				var sel = allsel.split(",");
+			}
+		}catch{
+		}
+		try{
+			var lvl = url.split("level=")[1].split("&")[0];
+		}catch{
+		}
+		if(lvl == ""){
+			lvl = 1;
+		}
+		sClass(curc);
+		document.getElementById("lvlselect").selectedIndex = lvl-1;
+		levels = lvl;
+		pontos = lvl;
+		setLevels();
+		for(var i = 0; i < sel.length; i++){
+			try{
+				selectHab(habs[sel[i]].getCod());
+			}catch(err){
+			}
+		}
+		document.getElementById("pts").innerHTML = pontos;
+	}
+}
+
+function restate(){
+	curclass = 0;
+	levels = 1;
+	pontos = 1;
+	document.getElementById("lvlselect").selectedIndex = levels-1;
+	sClass(curclass);
+	setLevels();
+}
+
+function save(){
+	try{
+		var curp = "?";
+		curp += "curclass="+curclass+"&";
+		curp += "level="+levels+"&";
+		curp += "selected=";
+		var sel = 0;
+		for (var i = 0; i < habs.length; i++){
+			if(habs[i].isSelected()){
+				sel++;
+				curp += i+",";
+			}
+		}
+		if(sel>0){
+			curp = curp.substring(0,curp.length-1) + "&";
+		}else{
+			curp = curp.substring(0,curp.length-9);
+		}
+		
+		curp = curp.substring(0,curp.length-1);
+		window.history.pushState('Hability Viewer', 'Hability Viewer', curp);
+	}catch(err){
+	}
 }
 
 function loadclasses(){
 	var classes = getTags("class",xmltotal);
 	var html = "";
+	cdesc = [];
 	for(var i = 0; i < classes.length; i++){
-		var name = getTag("cname",0,classes[i]);
-		var img = getTag("cimg",0,classes[i]);
-		html += "<div id=\""+i+"\" style=\"width:100px;height:100px;filter:grayscale(100%);\""
+		try{
+			var name = getTag("cname",0,classes[i]);
+			var img = getTag("cimg",0,classes[i]);
+			cdesc = cdesc.concat(decode(getTag("cdesc",0,classes[i]) + "<br/>" + getTag("passiva",0,classes[i])));
+			var bs = "";
+			var gs = 0;
+			if(curclass == i){
+				var bs = "box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 1);";
+			}
+			html += `<div id="`+i+`" onclick="sClass(`+i+`)" style="display:inline-block;
+			text-align:center;
+			width:110px;
+			height:110px;
+			border-radius: 50px;
+			
+			filter:grayscale(`+gs+`%);">
+			<img style="
+			width:100px;
+			height:100px;
+			border-radius: 50px;
+			`+bs+`"
+			src="`+img+`"></img><br/>
+			`+name+`
+			</div>`;
+		}catch(err){
+		}
 	}
+	document.getElementById("classes").innerHTML = html;
+}
+
+function sincPosition(){
+	if(cdesc.length > 0){
+		document.getElementById("cadd").innerHTML = cdesc[curclass];
+		var x = $("#canv").offset();
+		document.getElementById("habs").style.top = x.top +"px";
+	}
+	setTimeout(sincPosition, 100);
+}
+
+function sClass(c){
+	curclass = c;
+	if(cdesc.length > 0){
+		document.getElementById("cadd").innerHTML = cdesc[curclass];
+	}
+	load();
+	save();
 }
 
 function reload(){
@@ -91,11 +247,13 @@ function click(cod){
 		refreshPts();
 	}else{
 	}
+	save();
 }
 
 function setLevels(){
 	levels = document.getElementById("lvlselect").value;
 	resetPts();
+	save();
 }
 
 function selectHab(cod){
@@ -110,12 +268,12 @@ function selectHab(cod){
 		for(var i = 0; i < rh.length; i++){
 			selectHab(rh[i]);
 		}
-		if(pontos > 0 & !habs[pos].isSelected()){
+		if(pontos > 0 & !habs[pos].isSelected() & levels >= parseInt(habs[pos].reqlvl)){
 			pontos--;
 			habs[pos].select();
 		}
 	}else{
-		if(pontos > 0 & !habs[pos].isSelected()){
+		if(pontos > 0 & !habs[pos].isSelected() & levels >= parseInt(habs[pos].reqlvl)){
 			pontos--;
 			habs[pos].select();
 		}
@@ -201,7 +359,6 @@ function setRows(){
 	for(var i = 0; i < rquant; i++){
 		rows = rows.concat(i+1);
 	}
-	//log(rows);
 }
 
 function setPositions(){
@@ -229,7 +386,6 @@ function setPositions(){
 						habs[h].setX(x);
 					}
 				}catch(err){
-					//log(err);
 				}
 			}
 		}
@@ -250,7 +406,6 @@ function colideX(x,cod){
 	var y = habs[cod].getY();
 	for(var i = 0; i < habs.length; i++){
 		var samereq = compareReqHab(cod,i);
-		//log(samereq);
 		if(habs[i].getCod() != habs[cod].getCod() & habs[cod].getCod() != 0){
 			if((habs[i].getX() <= x & habs[i].getX() + habs[i].getWid() >= x) &
 				(habs[i].getY() <= y & habs[i].getY() + globalhei > y)){
@@ -399,6 +554,20 @@ class hability {
 		this.img = decode(getTag("image",0,xml));
 		this.title = decode(getTag("title",0,xml));
 		this.type = decode(getTag("type",0,xml));
+		this.distance = "";
+		if(getTag("distance",0,xml)+"" != ""){
+			this.distance = decode("Alcânce: "+decode(getTag("distance",0,xml)) + "<br/>");
+		}
+		this.cooldown = "";
+		if(getTag("cooldown",0,xml)+"" != ""){
+			this.cooldown = "Tempo de Recarga: "+decode(getTag("cooldown",0,xml)) + "<br/>";
+		}
+		this.mana = "";
+		if(getTag("mana",0,xml)+"" != ""){
+			this.mana = "<b style=\"color:#00f6ff;\">Custo de Mana: </b>" + decode(getTag("mana",0,xml)) + "<br/>";
+		}else{
+			this.mana = "";
+		}
 		this.description = decode(getTag("description",0,xml));
 		this.reqlvl = decode(getTag("reqlvl",0,xml));
 		this.reqhab = getTags("reqhab",xml);
@@ -428,21 +597,21 @@ class hability {
 			this.reqhabtitle = this.reqhabtitle.substring(0,this.reqhabtitle.length-2);
 		}
 		catch(err){
-			//log(err);
 		}
 		this.setHtml();
 	}
 	
 	setHtml(){
-	var textshadow = " -1px -1px 4px #000, ";
-	var tsm = 6;
-	var tsfinal = "";
-	
-	for(var i = 0; i < tsm; i++){
-		tsfinal += textshadow;
-	}
-	
-	tsfinal = tsfinal.substring(0,tsfinal.length-2);
+		var textshadow = " -1px -1px 4px #000, ";
+		var tsm = 6;
+		var tsfinal = "";
+		
+		for(var i = 0; i < tsm; i++){
+			tsfinal += textshadow;
+		}
+		
+		tsfinal = tsfinal.substring(0,tsfinal.length-2);
+		
 		this.html = "<div id=\"h"+this.cod
 		+"\" style=\"position:absolute;"
 		+"left:"+this.x+"px;"
@@ -463,6 +632,9 @@ class hability {
 		+"<br/>TIPO: "
 		+this.type
 		+"<br/><b>"
+		+this.distance
+		+this.cooldown
+		+this.mana
 		+decode("Pré Requisito: ")
 		+this.reqhabtitle + " | Level " + this.reqlvl
 		+"</b><br/>"
@@ -594,59 +766,137 @@ function decode(s) {
 	}
 }
 
+
+function getAllUrlParams(url) {
+
+  // get query string from url (optional) or window
+  var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+
+  // we'll store the parameters here
+  var obj = {};
+
+  // if query string exists
+  if (queryString) {
+
+    // stuff after # is not part of query string, so get rid of it
+    queryString = queryString.split('#')[0];
+
+    // split our query string into its component parts
+    var arr = queryString.split('&');
+
+    for (var i=0; i<arr.length; i++) {
+      // separate the keys and the values
+      var a = arr[i].split('=');
+
+      // in case params look like: list[]=thing1&list[]=thing2
+      var paramNum = undefined;
+      var paramName = a[0].replace(/\[\d*\]/, function(v) {
+        paramNum = v.slice(1,-1);
+        return '';
+      });
+
+      // set parameter value (use 'true' if empty)
+      var paramValue = typeof(a[1])==='undefined' ? true : a[1];
+
+      // (optional) keep case consistent
+      paramName = paramName.toLowerCase();
+      paramValue = paramValue.toLowerCase();
+
+      // if parameter name already exists
+      if (obj[paramName]) {
+        // convert value to array (if still string)
+        if (typeof obj[paramName] === 'string') {
+          obj[paramName] = [obj[paramName]];
+        }
+        // if no array index number specified...
+        if (typeof paramNum === 'undefined') {
+          // put the value on the end of the array
+          obj[paramName].push(paramValue);
+        }
+        // if array index number specified...
+        else {
+          // put the value at that index number
+          obj[paramName][paramNum] = paramValue;
+        }
+      }
+      // if param name doesn't exist yet, set it
+      else {
+        obj[paramName] = paramValue;
+      }
+    }
+  }
+
+  return obj;
+}
+
 function convert(tsv){
 	var xml = "";
 	
-	var tables = tsv.split("\n--										\n");
+	var tables = tsv.split("\n--												");
 	
 	for(var t = 0; t < tables.length; t++){
-		xml +="<class>";
-		xml +="<cname>"+tables[t].split("	")[0]+"</cname><cimg>"+tables[t].split("	")[1]+"</cimg>";
-		var rows = tables[t].split("\n");
-		for(var i = 1; i < rows.length; i++){
-			var vals = rows[i].split("	");
-			var cod = vals[0];
-			var img = vals[1];
-			var title = vals[2];
-			var row = vals[3];
-			var r1 = vals[4] + "";
-			var r2 = vals[5] + "";
-			var r3 = vals[6] + "";
-			var r4 = vals[7] + "";
-			var lvl = vals[8];
-			var type = vals[9];
-			var desc = vals[10];
-			var reqtext = "";
-			if(r1 != ""){
-				reqtext += "<reqhab>"+r1+"</reqhab>";
+		if(tables[t].length > 4){
+			xml +="<class>";
+			xml +="<cname>"+tables[t].split("	")[0]+"</cname>";
+			xml +="<cimg>"+tables[t].split("	")[1]+"</cimg>";
+			xml +="<passiva>"+tables[t].split("	")[11]+"</passiva>";
+			xml +="<cdesc>"+tables[t].split("	")[12]+"</cdesc>";
+			
+			var rows = tables[t].split("\n");
+			for(var i = 1; i < rows.length; i++){
+				try{
+					var vals = rows[i].split("	");
+					var a = parseInt(vals[0]) + "";
+					if(a != "NaN"){
+						var cod = vals[0];
+						var img = vals[1];
+						var title = vals[2];
+						var row = vals[3];
+						var r1 = vals[4] + "";
+						var r2 = vals[5] + "";
+						var r3 = vals[6] + "";
+						var dist = vals[7] + "";
+						var cd = vals[8] + "";
+						var mana = vals[9] + "";
+						var lvl = vals[10];
+						var type = vals[11];
+						var desc = vals[12];
+						var reqtext = "";
+						if(r1 != ""){
+							reqtext += "<reqhab>"+r1+"</reqhab>";
+						}
+						if(r2 != ""){
+							reqtext += "<reqhab>"+r2+"</reqhab>";
+						}
+						if(r3 != ""){
+							reqtext += "<reqhab>"+r3+"</reqhab>";
+						}
+						var bracket = `
+						<hability>
+							<cod>`+cod+`</cod>
+							<image>`+img+`</image>
+							<title>`+title+`</title>
+							<row>`+row+`</row>
+							<requires>`+reqtext+`</requires>
+							<reqlvl>`+lvl+`</reqlvl>
+							<type>`+type+`</type>
+							<cooldown>`+cd+`</cooldown>
+							<distance>`+dist+`</distance>
+							<mana>`+mana+`</mana>
+							<description>`+desc+`</description>
+						</hability>
+						`;
+						xml += bracket;
+					}
+				}catch(err){
+					
+				}
+				
+				
 			}
-			if(r2 != ""){
-				reqtext += "<reqhab>"+r2+"</reqhab>";
-			}
-			if(r3 != ""){
-				reqtext += "<reqhab>"+r3+"</reqhab>";
-			}
-			if(r4 != ""){
-				reqtext += "<reqhab>"+r4+"</reqhab>";
-			}
-			var bracket = `
-			<hability>
-				<cod>`+cod+`</cod>
-				<image>`+img+`</image>
-				<title>`+title+`</title>
-				<row>`+row+`</row>
-				<requires>`+reqtext+`</requires>
-				<reqlvl>`+lvl+`</reqlvl>
-				<type>`+type+`</type>
-				<description>`+desc+`</description>
-			</hability>
-			`;
-			xml += bracket;
+			xml +="</class>";
 		}
-		xml +="</class>";
 	}
-	
-	
 	return xml;
 }
 
@@ -676,176 +926,5 @@ var xmlmodel = `
 
 var xmlfinal = "";
 
-var xmlstring = `<class>
-	<hability>
-		<cod>0</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0114.jpg
-		</image>
-		<title>
-		Defender Impacto
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>Ativa (Defensiva)</type>
-		<description>
-		Ganhe +1 permanente para usar o movimento Defender.
-		</description>
-	</hability>
-	<hability>
-		<cod>1</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0214.jpg
-		</image>
-		<title>
-		Pancada Corporal
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Ativa (Ofensiva)
-		</type>
-		<description>
-		Usa o próprio corpo para causar dano em um inimigo. O dano é equivalente a 1d6 +2 para cada 10 pontos de vida máxima.
-		</description>
-	</hability>
-	<hability>
-		<cod>2</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0314.jpg
-		</image>
-		<title>
-		Reforçar Armadura
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Aumenta permanentemente a Armadura em +1.
-		</description>
-	</hability>
-	<hability>
-		<cod>3</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0414.jpg
-		</image>
-		<title>
-		Reforçar Defesa Mágica
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Aumenta permanentemente a Defesa Mágica em +1.
-		</description>
-	</hability>
-	<hability>
-		<cod>4</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0514.jpg
-		</image>
-		<title>
-		Vitalidade
-		</title>
-		<row>1</row>
-		<requires>
-		<reqhab></reqhab>
-		<reqlvl>2</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Ganha +1 de HP máximo para cada 2 níveis.
-		</description>
-	</hability>
-	<hability>
-		<cod>5</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0614.jpg
-		</image>
-		<title>
-		Força de Espírito
-		</title>
-		<row>2</row>
-		<requires>
-		<reqhab>4</reqhab>
-		<reqlvl>2</reqlvl></requires>
-		<type>
-		Passiva
-		</type>
-		<description>
-		Regenera 1 de vida por turno para cada 10 pontos de HP máximo.
-		</description>
-	</hability>
-	<hability>
-		<cod>6</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0714.jpg
-		</image>
-		<title>
-		Revestir
-		</title>
-		<row>2</row>
-		<requires>
-		<reqhab>2</reqhab>
-		<reqhab>3</reqhab>
-		<reqlvl>1</reqlvl></requires>
-		<type>
-		Ativa (Defensiva)
-		</type>
-		<description>
-		Aumenta o bônus de Reforçar Armadura e Reforçar Defesa Mágica por +1 por 2 turnos.
-		</description>
-	</hability>
-	<hability>
-		<cod>7</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0815.jpg
-		</image>
-		<title>
-		Pancada Estonteante
-		</title>
-		<row>4</row>
-		<requires>
-		<reqhab>1</reqhab>
-		<reqlvl>5</reqlvl></requires>
-		<type>
-		Ativa (Ofensiva)
-		</type>
-		<description>
-		Dá uma pancada forte no corpo de um oponente que lhe joga para longe e causa 1d8 de dano.
-		</description>
-	</hability>
-	<hability>
-		<cod>8</cod>
-		<image>
-		https://i.servimg.com/u/f58/16/36/10/96/0914.jpg
-		</image>
-		<title>
-		Escudo Refletor
-		</title>
-		<row>4</row>
-		<requires>
-		<reqhab>0</reqhab>
-		<reqlvl>5</reqlvl></requires>
-		<type>
-		Ativa (Utilitária)
-		</type>
-		<description>
-		Ao ativar esta habilidade, ela durará por 3 turnos e devolverá 1d4 para cado dano recebido ao atacante automaticamente (se o atacante acertar a pancada no Tank, ele sofrerá o dano de retorno sem precisar de rolagem).
-		</description>
-	</hability>
-</class>
+var xmlstring = `
 `;
