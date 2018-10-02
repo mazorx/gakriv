@@ -15,15 +15,28 @@ var urlparams = "";
 var urlloaded = false;
 var url = window.location.href;
 
-function load(){
-	var tsvonline = "";
+function httpGet(url){
 	try{
-		tsvonline = $.ajax({
-			url: "https://rawgit.com/mazorx/gakriv/master/habilidades.tsv",
-			async: false
-		}).responseText;
+		var xmlhttp = new XMLHttpRequest();
+		if (!window.XMLHttpRequest){ //Ie da desgrasa
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		xmlhttp.addEventListener("load", function(){
+			console.log("xml loaded");
+		});
+		xmlhttp.open("GET", url, false);
+		xmlhttp.send();
+		return xmlhttp.responseText;
 	}catch(err){
 	}
+}
+function reqListener () {
+}
+
+function load(){
+	var tsvonline = "";
+	tsvonline = httpGet("https://raw.githubusercontent.com/mazorx/gakriv/master/habilidades.tsv");
 	
     var x, i, txt, xmlDoc;
 	parser = new DOMParser();
